@@ -1,0 +1,51 @@
+Game Design 1 (Visual Novel?)
+
+My idea works with hidden variables. One is the belief variable which is determined by periodically asking the user whether they believe the information an non-player character tells them. Each piece of information given is either True or False, and has a agreement level and a disagreement level
+
+Agreeing with a True statement will increase belief by it’s agreement level
+Disagreeing with a True statement will decrease belief by it’s disagreement level
+Agreeing with a False statement will decrease belief by it’s agreement level
+Disagreeing with a False statement will increase belief by it’s disagreement level
+Example 1: “The Emermites stole the shard. I saw them do it!” (agree: belief –3, disagree: belief + 1)
+Example 2: “The Emermites could not have been the ones who stole the shard. My team did tests and did not find any traces of Emermite in the building. But we did find a strand of human hair” (agree: belief +5, disagree: belief -3)
+
+The belief variable influences the choices the user can make in the game and influences the ending. Positive belief means that the player is well informed about the situation, while negative belief means that the player is misinformed about the situation. There are also history books which the user can read, and infer information from (Though inferred information is not stated in the game and only effects the end game decision). History is stuff like the Boss Star having used all 5 star shard and becoming a dragon, and enslaving Emermites, but having these confiscated, to infer that the Boss Star wants revenge (another thing to note is that said history books are burned in Gigum’s nation, giving some suspicious stuff)
+
+ 
+
+
+Game Design 2 (IDK)
+
+My second idea works with 5 hidden variables. These cannot go below zero. Each variable is how much the player suspects each nation. The variables are determined by periodically asking the user whether they believe the information an non-player character tells them. Each piece of information given is related to a race, and has a agreement level and a disagreement level
+
+
+Example 1: “The Emermites stole the shard. I saw them do it!” (agree: Suspect Emermite + 3, disagree: Suspect Emermite - 2)
+Example 2: “The Harp Birds Obviously stole it. They probably hate us [keekee’s]” (agree: suspect Harp Birds +1, disagree: suspect Harp Birds - 1)
+
+There are also history books which the user can read, and infer information from (Though inferred information is not stated in the game and does not affect the game). History is stuff like the Boss Star having used all 5 star shard and becoming a dragon, and enslaving Emermites, but having these confiscated, to infer that the Boss Star wants revenge (another thing to note is that said history books are burned in Gigum’s nation, giving some suspicious stuff)
+
+
+In the end, the player only can suspect the top three suspected races, and may / may not be able to choose a specific character (One of the levithian generals, Boss Star, Gigum, ect). When they do so, they get into a fight with the named character. The ending is also determined by whether they won or lost.
+
+ 
+
+Game Design 3 (IDK)
+
+My third game design is a lot simpler than the first and the second, but doesn't have as many endings. Basically there is a hidden variable called information, which determines the ending. Information is gained by finishing side quests or by reading history books. It doesn't get much simpler than that.
+
+ 
+
+Game Design 4 (Branching Storyline)
+
+My fourth design is similar to the stories design. Basically the player makes a decision, then completes a level. Then they make another decision and complete another level. By completing certain levels, they unlock secrets that unlock new decisions. After obtaining all the secrets, the final ending is unlocked.
+
+
+Global Game Design
+
+When the player dies, if the death was an ending death, an ending will occur. Otherwise a minor death text will be displayed. An example of this is if the player dies in the forest, the ending is “You die in the forest, DESCRIPTION OF HOW THE DEATH OCCURRED. Your body decomposes and never gets a proper burial”.
+
+
+In the game, when a choice to go somewhere is made, this does not actually effect where the player goes, it only means that the player get the information of how to get to the place. If the player goes in some other direction, then they go to that place instead, and trigger some other event.
+
+
+The player may, at any time, go to the capital building thing (Basically where the government of the country the player is in) and denounce anyone (Such as Gigum, the Boss Star, one of three levithian military generals, one of the bigger Keekee states or the harp birds), although if they are not high level enough, they will get defeated. They may also steal the star shards, although this will also be very difficult.

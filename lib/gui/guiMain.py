@@ -17,7 +17,14 @@ except ImportError:
     import gui.guitkinter as GuiModule        
 
 
-class GuiOverworldEntities(GuiModule.ComplexImage):
+sprites = GuiModule.sprites
+ImageName = GuiModule.ImageName
+imageDict = GuiModule.imageDict #Should not be needed
+DormantImage = GuiModule.DormantImage
+ComplexImage = GuiModule.ComplexImage
+
+
+class GuiOverworldEntities(ComplexImage):
     """Overworld entity class"""
     animationSpeed = 2
     imagePrefix = 'entity'
@@ -74,7 +81,7 @@ class GuiOverworldEntities(GuiModule.ComplexImage):
         legdir = GuiOverworldEntities.animations
         return legdir[e.hasMoved][e.animationState['state']]
 
-class GuiOverworldTerrain(GuiModule.ComplexImage):
+class GuiOverworldTerrain(ComplexImage):
     """docstring for Terrain"""
     def __init__(self, layer=1):
         self.x = 0
@@ -98,7 +105,7 @@ class GuiOverworldTerrain(GuiModule.ComplexImage):
                 image = ImageName(image)
                 self.terrain[x][y].update(image)
 
-class Board(GuiModule.ComplexImage):
+class Board(ComplexImage):
     """Board for gui"""
     def __init__(self):
         self.x = 0

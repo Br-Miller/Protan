@@ -17,9 +17,7 @@ except ImportError:
     import gui.guitkinter as GuiModule        
 
 
-sprites = GuiModule.sprites
 ImageName = GuiModule.ImageName
-imageDict = GuiModule.imageDict #Should not be needed
 DormantImage = GuiModule.DormantImage
 ComplexImage = GuiModule.ComplexImage
 
@@ -51,12 +49,11 @@ class GuiOverworldEntities(ComplexImage):
             self.images[i].update(image, sx=x, sy=y)
         self.show()
 
-    def layersort(self, x, y):
+    def layersort(self, a, b):
         """Sorts images by ycoord"""
-        a = cmp(y.y, x.y)
-        if a == 0: 
-            return cmp(y.x, x.x)
-        return a
+        x = cmp(b.y, a.y)
+        y = cmp(b.x, a.x)
+        return x or y
 
     @staticmethod
     def entityName(e):
@@ -65,15 +62,6 @@ class GuiOverworldEntities(ComplexImage):
         state = e.animState()
         prefix = GuiOverworldEntities.imagePrefix
         return '-'.join([prefix, e.name, face, state])
-
-    @staticmethod
-    def entityLegdir(e):
-        """docstring for entityLegdir"""
-        if e.animationState['frame'] >= GuiOverworldEntities.animationSpeed:
-            e.animationState['frame'] = 0
-            e.animationState['state'] = not(e.animationState['state']) #To 1 or 0. Toggles
-        legdir = GuiOverworldEntities.animations
-        return legdir[e.hasMoved][e.animationState['state']]
 
 class GuiOverworldTerrain(ComplexImage):
     """docstring for Terrain"""
@@ -125,3 +113,6 @@ class Gui(GuiModule.GuiBase):
         self.images = {
             'board': Board(),
         }
+        super(Gui, self).__init__()
+        global sprites
+        sprites = GuiModule.sprites

@@ -29,7 +29,7 @@ class OverworldEntity(object):
   Hurt box refers to the entities whole hitbox relating to other entities
   Collision box refers to the entities feet relating to movement
   """
-  frameTime = 5
+  frameTime = 15
   TileLowerCollisionBox = AxisDistance(px=2)
   def __init__(self, coord, config):
     """Class constructor
@@ -56,9 +56,7 @@ class OverworldEntity(object):
   def animState(self):
     d = {True: 'walk', False: 'idle'}
     anim = self.anims[ d[self.hasmoved] ]
-
-    if self.prestate != self.hasmoved:
-      anim.rewind()
+    if self.prestate != self.hasmoved: anim.rewind()
     anim.update()
     return anim.tile
 
@@ -88,9 +86,6 @@ class OverworldEntity(object):
     Should only happen once per frame
     """
     self.face(face or self.facing)
-
-    if Debug and self.hasmoved:
-      pass #LOG FRAME ERROR
 
     if self.canMoveTo(self.moveResultPos(), board, entities):
       self._move()

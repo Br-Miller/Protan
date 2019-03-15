@@ -12,7 +12,7 @@ os.chdir('./../lib')
 from gameobj.board import MapArea
 from gameobj.entities import OverworldEntity
 from mixins.CoordPos import AxisDistance, BasicRectangleArea, Coordinate, Direction
-from gui.guiPlaceholder import Gui
+from gui.guiMain import Gui
 
 gui = Gui()
 gui('board.show', True)

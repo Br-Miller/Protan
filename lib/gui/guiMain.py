@@ -44,7 +44,7 @@ class GuiOverworldEntities(ComplexImage):
         self.cleanup(l)
 
         for i, entity in enumerate(l):
-            x, y = entity.position.toPixels()
+            x, y = entity.pos.toPixels()
             image = self.entityName(entity)
             self.images[i].update(image, sx=x, sy=y)
         self.show()

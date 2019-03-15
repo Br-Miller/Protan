@@ -110,9 +110,9 @@ class Gui(GuiModule.GuiBase):
     """Main gui module for the game"""
     def __init__(self):
         """Class constructor"""
+        super(Gui, self).__init__()
         self.images = {
             'board': Board(),
         }
-        super(Gui, self).__init__()
         global sprites
         sprites = GuiModule.sprites

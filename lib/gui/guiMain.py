@@ -26,12 +26,7 @@ ComplexImage = GuiModule.ComplexImage
 
 class GuiOverworldEntities(ComplexImage):
     """Overworld entity class"""
-    animationSpeed = 2
     imagePrefix = 'entity'
-    animations = {
-        False: ['b', 'n'], #Idle
-        True: ['l', 'r'], #Walking
-    }
     def __init__(self, layer=1):
         self.x = 0
         self.y = 0
@@ -66,11 +61,10 @@ class GuiOverworldEntities(ComplexImage):
     @staticmethod
     def entityName(e):
         """Returns the entitys image name"""
-        name = e.name
-        facing = str(e.facingLinear)
+        face = str(e.facingLinear)
+        state = e.animState()
         prefix = GuiOverworldEntities.imagePrefix
-        legdir = GuiOverworldEntities.entityLegdir(e)
-        return '-'.join([prefix, name, facing, legdir])
+        return '-'.join([prefix, e.name, face, state])
 
     @staticmethod
     def entityLegdir(e):
@@ -89,9 +83,9 @@ class GuiOverworldTerrain(ComplexImage):
         self.layer = layer
         self.images = []
         self.terrain = []
-        for x in range(BoardWidth):
+        for x in range(GuiModule.BoardWidth):
             a = []
-            for y in range(BoardHeight):
+            for y in range(GuiModule.BoardHeight):
                 img = DormantImage(x*32, y*32, 'terrain-debug1', layer=4)
                 a.append(img)
             self.images.extend(a)
@@ -99,8 +93,8 @@ class GuiOverworldTerrain(ComplexImage):
         super(GuiOverworldTerrain, self).__init__()
 
     def update(self, board):
-        for x in range(BoardWidth):
-            for y in range(BoardHeight):
+        for x in range(GuiModule.BoardWidth):
+            for y in range(GuiModule.BoardHeight):
                 image = board[x, y].image()
                 image = ImageName(image)
                 self.terrain[x][y].update(image)

@@ -22,7 +22,7 @@ DormantImage = GuiModule.DormantImage
 ComplexImage = GuiModule.ComplexImage
 
 
-class GuiOverworldEntities(ComplexImage):
+class GuiEntityOverworld(ComplexImage):
     """Overworld entity class"""
     imagePrefix = 'entity'
     def __init__(self, layer=1):
@@ -60,8 +60,8 @@ class GuiOverworldEntities(ComplexImage):
         """Returns the entitys image name"""
         face = str(e.facingLinear)
         state = e.animState()
-        prefix = GuiOverworldEntities.imagePrefix
-        return '-'.join([prefix, e.name, face, state])
+        prefix = GuiEntityOverworld.imagePrefix
+        return '-'.join([prefix, e.id, face, state])
 
 class GuiOverworldTerrain(ComplexImage):
     """docstring for Terrain"""
@@ -94,7 +94,7 @@ class Board(ComplexImage):
         self.y = 0
         self.layer = 4
         self.terrain = GuiOverworldTerrain(layer=4)
-        self.entities = GuiOverworldEntities(layer=2)
+        self.entities = GuiEntityOverworld(layer=2)
         self.images = [self.terrain, self.entities]
         super(Board, self).__init__()
         

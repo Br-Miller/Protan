@@ -3,8 +3,8 @@
 All time is measured in ticks (60TicksPerSecond)
 All distance is measured in AxisDistance
 
-Pending Updates
-  Add customHitbox on Overworld Entity
+To do list
+  Add customHitbox on EntityOverworld
 """
 
 import os, sys
@@ -23,37 +23,49 @@ Debug = None
 class EntityRootError(Exception):
   """Root error class"""
 
-
-class OverworldEntity(object):
-  """Base overworld entity class
+class EntityOverworld(object):
+  """Generic entity overworld class
   Hurt box refers to the entities whole hitbox relating to other entities
   Collision box refers to the entities feet relating to movement
   """
   frameTime = 15
   TileLowerCollisionBox = AxisDistance(px=2)
+  configDefault = {
+    'id': 'missingEntity',
+    'name': 'MissingText',
+    'move': {'p': 2},
+    'face': 's',
+  }
   def __init__(self, coord, config):
     """Class constructor
-    Facing defaults to North
-    Movespeed is measured in tiles per second originally, and is converted into pixels per frame
+    Facing defaults to north
+    Movespeed is measured in tiles per second and is converted into pixels per frame
     """
     assert isinstance(coord, Coordinate), 'incorrect type of arg coord: should be type Coordinate, is type {}'.format(type(coord))
+    assert isinstance(config, dict), 'incorrect type of arg config: should be type dict, is type {}'.format(type(config))
+    
+    d = EntityOverworld.configDefault.copy()
+    d.update(config)
+    
     self.anims = self.animsCreate()
-    self.prestate = False #moved last turn?
-    self.hasmoved = False
+    self.prestate = False #Moved last turn
+    self.hasmoved = False #Moved this turn
 
     self.pos = coord
-    self.name = config['name']
-    self.facing = Direction(config['facing'])
-    self.moveSpeed = AxisDistance(**config['moveSpeed'])
-    self.facingLinear = Direction(config['facing'])
-    super(OverworldEntity, self).__init__()
+    self.id = d['id']
+    self.name = d['name']
+    self.moveSpeed = AxisDistance(**d['move'])
+    self.facing = Direction(d['face'])
+    self.facingLinear = Direction(d['face'])
+    super(EntityOverworld, self).__init__()
 
   def animsCreate(self):
-    i = ig.Animation(OverworldEntity.frameTime, ['n', 'b'])
-    w = ig.Animation(OverworldEntity.frameTime, ['l', 'r'])
+    i = ig.Animation(EntityOverworld.frameTime, ['n', 'b'])
+    w = ig.Animation(EntityOverworld.frameTime, ['l', 'r'])
     return { 'idle': i, 'walk': w }
 
   def animState(self):
+    """Returns the current animation state"""
     d = {True: 'walk', False: 'idle'}
     anim = self.anims[ d[self.hasmoved] ]
     if self.prestate != self.hasmoved: anim.rewind()
@@ -61,10 +73,12 @@ class OverworldEntity(object):
     return anim.tile
 
   def collisionBox(self, coord=None):
-    """Returns the collision box of the enemy"""
+    """Returns the collision box of the enemy
+    The collision box is the entities feet
+    """
     coord = coord or self.pos
     width = TilePixels
-    height = OverworldEntity.TileLowerCollisionBox
+    height = EntityOverworld.TileLowerCollisionBox
     return BasicRectangleArea(coord, width, height)
 
   def hurtBox(self):
@@ -82,9 +96,7 @@ class OverworldEntity(object):
     self.pos = self.moveResultPos()
 
   def move(self, board, entities, face=None):
-    """Conditional move
-    Should only happen once per frame
-    """
+    """Conditional move"""
     self.face(face or self.facing)
 
     if self.canMoveTo(self.moveResultPos(), board, entities):
@@ -109,26 +121,26 @@ class OverworldEntity(object):
     return not(tileCollision or entityCollision)
 
   def tick(self):
-    """Ticks the player and resets hasmoved
-    Used to test the players movement for the gui
+    """Resets data from last frame
+    Resets hasmoved and sets prestate
+    Assists the gui
     """
     self.prestate = self.hasmoved
     self.hasmoved = False
 
   def isColliding(self, x): #UPDATE TO MAKE COLLISION
     """Relates to movement"""
-    assert isinstance(x, OverworldEntity) or isinstance(x, BasicRectangleArea), 'incorrect type of arg x: should be type BasicRectangleArea or OverworldEntity, is type {}'.format(type(x))
-    if isinstance(x, OverworldEntity): x = x.collisionBox()
+    assert isinstance(x, EntityOverworld) or isinstance(x, BasicRectangleArea), 'incorrect type of arg x: should be type BasicRectangleArea or OverworldEntity, is type {}'.format(type(x))
+    if isinstance(x, EntityOverworld): x = x.collisionBox()
     return collisionBox.intersection(x)
 
   def isHit(self, x):
     """Returns whether the entity is colliding with another entity"""
-    assert isinstance(x, OverworldEntity), 'incorrect type of arg x: should be type OverworldEntity, is type {}'.format(type(x))
+    assert isinstance(x, EntityOverworld), 'incorrect type of arg x: should be type OverworldEntity, is type {}'.format(type(x))
     return self.hurtBox().intersection(x.hurtBox())
 
-
-class CombatEntity(object):
-  """Base turn based entity combat class"""
+class EntityCombat(object):
+  """Generic turn based entity combat class"""
   _lastId = 0
   damageCalculator = lambda atk, dfs: max([0, atk - dfs])
   def __init__(self, hp, atk, dfs, spd, man, ccr, exp, spatk):
@@ -146,10 +158,10 @@ class CombatEntity(object):
     self.animSheet = 0
     self.currentAnim = 0
 
-    self.identifier = CombatEntity._lastId
+    self.identifier = EntityCombat._lastId
     self.pos = None #FIX UP
    #self.mag = mag #ADD OR NOT?
-    CombatEntity._lastId += 1
+    EntityCombat._lastId += 1
 
   def destroy(self):
     pass #DESTROY ig.game.destroy(self)
@@ -164,7 +176,7 @@ class CombatEntity(object):
     return self.hp <= 0
 
   def recieveDamage(self, n):
-    self.hp -= CombatEntity.damageCalculator(n, self.dfs)
+    self.hp -= EntityCombat.damageCalculator(n, self.dfs)
 
   def kill(self):
     self.hp = 0

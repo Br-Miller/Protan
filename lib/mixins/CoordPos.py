@@ -67,10 +67,10 @@ class AxisDistance(object):
         return self.__mul__(x)
 
     def __mul__(self, x):
-        assert isinstance(x, int), 'incorrect type of arg x: should be type int, is type {}'.format(type(x))
-        tile = self.tile * x
-        pixel = self.pixel * x
-        subpixel = self.subpixel * x
+        assert isinstance(x, int) or isinstance(x, float), 'incorrect type of arg x: should be type int or float, is type {}'.format(type(x))
+        tile = int(self.tile * x)
+        pixel = int(self.pixel * x)
+        subpixel = int(self.subpixel * x)
         return AxisDistance(t=tile, px=pixel, sx=subpixel)
 
     def __sub__(self, x):
@@ -123,6 +123,9 @@ class AxisDistance(object):
             return -AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
         return AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
 
+    def copy(self):
+        return AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
+    
     def cleanup(self):
         """Reduces the lower units"""
         self.subpixel, self.pixel = self.stepup(self.subpixel, self.pixel, AxisDistance.pixelsize)
@@ -325,134 +328,6 @@ class CoordList(list):
         self._basecoord = coord
 
 
-class CoordIt():
-    """Coordinate formatting mixin Deprecated"""
-    directions = {
-        'Up': [0, -1],
-        'Down': [0, 1],
-        'Left': [-1, 0],
-        'Right': [1, 0],
-        'Centre': [0, 0],
-    }
-    @staticmethod
-    def _coordFormatStr(x, y=None, to=False, char=' '):
-        """Internal function.
-        Converts coords to and from the str format
-        """
-        if to:
-            if isinstance(x, int) and isinstance(x, int):
-                return '%s%s%s' % (x, char, y)
-
-            else:
-                raise TypeError('Expected x and y to be int')
-
-        else:
-            s = [ int(i) for i in x.split(char)]
-            return s[0], s[1]
-
-    @staticmethod
-    def _coordFormatList(x, y=None, to=False):
-        """Internal function.
-        Converts coords to and from the list format
-        """
-        if to:
-            if isinstance(x, int) and isinstance(x, int):
-                return (x, y)
-
-            else:
-                raise TypeError('Expected x and y to be int')
-
-        else:
-            return x
-
-    @staticmethod
-    def _coordFormatInt(x, y=None, to=False):
-        """Internal function.
-        Converts coords to and from the int format
-        """
-        if to:
-            if isinstance(x, int) and isinstance(x, int):
-                return x, y
-
-            else:
-                raise TypeError('Expected x and y to be int')
-
-        else:
-            return x, y
-
-    @staticmethod
-    def _coordFormatCoord(x, y=None, to=False, char=' '):
-        """Internal function.
-        Converts coords to and from the Coordinate format
-        """
-        if to:
-            if isinstance(x, int) and isinstance(x, int):
-                return Coordinate(x, y)
-
-            else:
-                raise TypeError('Expected x and y to be int')
-
-        else:
-            return x.x, x.y
-
-    @staticmethod
-    def formatCoord(x, y=None, to=tuple):
-        """Formats supported coordinate formats to the type given
-        Supported formats include str, list, int and Coordinate
-        """
-        dFromCoord = {
-            int: self._coordFormatInt,
-            str: self._coordFormatStr,
-            list: self._coordFormatList,
-            tuple: self._coordFormatList,
-            Coordinate: self._coordFormatCoord,
-        }
-
-        x, y = dFromCoord[type[x]](x, y=y, to=False)
-        coord = dFromCoord[to](x, y=y, to=True)
-
-        #dToCoord = {
-        #  str: '%i %i' % (x, y),
-        #  list: [x, y],
-        #  tuple: (x, y),
-        #  'coord': Coordinate(x1, y1),
-        #}
-        #
-        #if to not in dToCoord:
-        #  raise TypeError('Invalid form ' + str(to))
-
-        #return dToCoord[to]
-        return coord
-
-    @staticmethod
-    def inBounds(coord, coordMin, coordMax=None):
-        """Warning! This function is pending deprecation
-        Returns whether the coordinate is in the given bounds
-        coordMax defaults to (0, 0)
-        """
-        if coordMax == None:
-            coordMax = coordMin
-            coordMin = 0
-
-        xList = [coordMin.x, coordMax.x]
-        yList = [coordMin.y, coordMax.y]
-        xMin = min(xList)
-        xMax = max(xList)
-        yMin = min(yList)
-        yMax = max(yList)
-        inX = xMin <= x < xMax
-        inY = yMin <= x < yMax
-        return inX and inY
-
-    @staticmethod
-    def toMinMax(basecoord, w, h):
-        """Forms 2 coordinates, forming a rectangle"""
-        x1, y1 = basecoord
-        x2 = x1 + w
-        y2 = y1 + h
-        return x1, y1, x2, y2
-
-
 class Coordinate(object):
     """Coordinate class to allow for easy access to coordinate functions
     There are three sizes. Tile > Pixel > Subpixel
@@ -505,6 +380,9 @@ class Coordinate(object):
         assert isinstance(coord, Coordinate), "incorrect type of arg coord: should be Coordinate, is {}".format(type(coord))
         coord = coord.flip('xy')
         return self.shift(coord)
+    
+    def copy(self):
+        return Coordinate(self.x.copy(), self.y.copy())
 
     def shift(self, coord, y=None):
         """Returns a new Coordinate instance, shifted this by arg coord"""
@@ -595,10 +473,9 @@ class Coordinate(object):
         y = self.y.limit(_min, _max)
         return Coordinate(x, y)
         
-
     def toPixels(self):
         return (self.x.toPixels(), self.y.toPixels())
-
+    
 
 class BasicRectangleArea(object):
     """docstring for BasicRectangleArea"""
@@ -622,48 +499,5 @@ class BasicRectangleArea(object):
         _x = self._intersection(self.xArea, x.xArea)
         _y = self._intersection(self.yArea, x.yArea)
         return _x and _y
-
-class CompactRectangleArea(object):
-    """docstring for CompactArea"""
-    def __contains__(self, x, y=None):
-        x, y = CoordIt.formatCoord(x, y=y)
-        inX = x in self.xArea
-        inY = y in self.yArea
-        return inX & inY
-
-    def __init__(self, basecoord, w, h):
-        self.xArea = range(basecoord[0], basecoord[0] + w)
-        self.yArea = range(basecoord[1], basecoord[1] + h)
-
-class CompactDiamondArea(object):
-    """docstring for CompactArea"""
-    def __contains__(self, x, y=None):
-        x1, y1 = self.basecoord
-        x2, y2 = CoordIt.formatCoord(x, y=y)
-        dist = CoordIt.coordDist(x1, y1, x2, y2, total=True)
-        return dist <= self.radius
-
-    def __init__(self, basecoord, radius):
-        super(CompactArea, self).__init__()
-        self.radius = radius
-        self.basecoord = basecoord
-
-
-class CompactDiamondEdgeArea(CompactDiamondArea):
-    """docstring for CompactArea"""
-    def __contains__(self, x, y=None):
-        x1, y1 = self.basecoord
-        x2, y2 = CoordIt.formatCoord(x, y=y)
-        dist = CoordIt.coordDist(x1, y1, x2, y2, total=True)
-        return dist == self.radius
-
-
-def CompactArea(form='rectangle', *args):
-    d = {
-        'diamond': CompactDiamondArea,
-        'rectangle': CompactRectangleArea,
-        'diamondEdge': CompactDiamondEdgeArea,
-    }
-    return d[form](*args)
         
         

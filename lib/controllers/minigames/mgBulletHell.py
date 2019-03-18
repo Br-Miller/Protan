@@ -110,94 +110,94 @@ class EntityBH(object):
     def ready():
         pass
         
-    @staticmethod
-    def checkPair(a, b):
-        if a.checkAgainst and b.type:
-            a.check(b)
+@staticmethod
+def checkPair(a, b):
+    if a.checkAgainst and b.type:
+        a.check(b)
 
-        if b.checkAgainst and a.type:
-            b.check(a)
+    if b.checkAgainst and a.type:
+        b.check(a)
 
-        if a.collides and b.collides and a.collides + b.collides > EntityBH.COLLIDES['ACTIVE']:
-            EntityBH.solveCollision(a, b)
-            
-    @staticmehtod
-    def solveCollision(a, b):
-        weak = None
-        if (a.collides == EntityBH.COLLIDES['LITE'] or b.collides == EntityBH.COLLIDES['FIXED']:
-            weak = a
-
-        elif (b.collides == EntityBH.COLLIDES['LITE'] or a.collides == EntityBH.COLLIDES['FIXED']:
-            weak = b
-
-        if (a.last.x + a.size.x > b.last.x and a.last.x < b.last.x + b.size.x):
-            if (a.last.y < b.last.y):
-                EntityBH.seperateOnYAxis(a, b, weak)
-
-            else:
-                EntityBH.seperateOnYAxis(b, a, weak)
-
-            a.collideWith(b, 'y')
-            b.collideWith(a, 'y')
-
-        elif (a.last.y + a.size.y > b.last.y and a.last.y < b.last.y + b.size.y):
-            if (a.last.x < b.last.x) {
-                EntityBH.seperateOnXAxis(a, b, weak)
-            else:
-                EntityBH.seperateOnXAxis(b, a, weak)
-            a.collideWith(b, 'x')
-            b.collideWith(a, 'x')
-
-    def seperateOnXAxis(left, right, weak):
-        nudge = (left.pos.x + left.size.x - right.pos.x)
-        if weak
-            strong = right if left is weak else left
-            weak.vel.x = -weak.vel.x * weak.bounciness + strong.vel.x
-            resWeak = ig.game.collisionMap.trace(weak.pos.x, weak.pos.y, weak == left ? -nudge : nudge, 0, weak.size.x, weak.size.y)
-            weak.pos.x = resWeak.pos.x
-        else:
-            v2 = (left.vel.x - right.vel.x) / 2
-            left.vel.x = -v2
-            right.vel.x = v2
-            resLeft = ig.game.collisionMap.trace(left.pos.x, left.pos.y, -nudge / 2, 0, left.size.x, left.size.y)
-            left.pos.x = Math.floor(resLeft.pos.x)
-            resRight = ig.game.collisionMap.trace(right.pos.x, right.pos.y, nudge / 2, 0, right.size.x, right.size.y)
-            right.pos.x = Math.ceil(resRight.pos.x)
-
-    def seperateOnYAxis(top, bottom, weak):
-        nudge = (top.pos.y + top.size.y - bottom.pos.y)
-        if weak:
-            strong = top === weak ? bottom : top
-            weak.vel.y = -weak.vel.y * weak.bounciness + strong.vel.y
-            nudgeX = 0
-            if (weak == top and Math.abs(weak.vel.y - strong.vel.y) < weak.minBounceVelocity):
-                weak.standing = true
-                nudgeX = strong.vel.x * ig.system.tick
-                
-            resWeak = ig.game.collisionMap.trace(weak.pos.x, weak.pos.y, nudgeX, weak == top ? -nudge : nudge, weak.size.x, weak.size.y)
-            weak.pos.y = resWeak.pos.y
-            weak.pos.x = resWeak.pos.x
-            
-        elif (ig.game.gravity and (bottom.standing or top.vel.y > 0)):
-            resTop = ig.game.collisionMap.trace(top.pos.x, top.pos.y, 0, -(top.pos.y + top.size.y - bottom.pos.y), top.size.x, top.size.y)
-            top.pos.y = resTop.pos.y
-            if (top.bounciness > 0 and top.vel.y > top.minBounceVelocity):
-                top.vel.y *= -top.bounciness
-
-            else:
-                top.standing = true
-                top.vel.y = 0
-
-        else:
-            v2 = (top.vel.y - bottom.vel.y) / 2
-            top.vel.y = -v2
-            bottom.vel.y = v2
-            nudgeX = bottom.vel.x * ig.system.tick
-            resTop = ig.game.collisionMap.trace(top.pos.x, top.pos.y, nudgeX, -nudge / 2, top.size.x, top.size.y)
-            top.pos.y = resTop.pos.y
-            resBottom = ig.game.collisionMap.trace(bottom.pos.x, bottom.pos.y, 0, nudge / 2, bottom.size.x, bottom.size.y)
-            bottom.pos.y = resBottom.pos.y
-            
-
-    
+    if a.collides and b.collides and a.collides + b.collides > EntityBH.COLLIDES['ACTIVE']:
+        EntityBH.solveCollision(a, b)
         
+@staticmethod
+def solveCollision(a, b):
+    weak = None
+    if a.collides == EntityBH.COLLIDES['LITE'] or b.collides == EntityBH.COLLIDES['FIXED']:
+        weak = a
+
+    elif b.collides == EntityBH.COLLIDES['LITE'] or a.collides == EntityBH.COLLIDES['FIXED']:
+        weak = b
+
+    if a.last.x + a.size.x > b.last.x and a.last.x < b.last.x + b.size.x:
+        if a.last.y < b.last.y:
+            EntityBH.seperateOnYAxis(a, b, weak)
+
+        else:
+            EntityBH.seperateOnYAxis(b, a, weak)
+
+        a.collideWith(b, 'y')
+        b.collideWith(a, 'y')
+
+    elif a.last.y + a.size.y > b.last.y and a.last.y < b.last.y + b.size.y:
+        if a.last.x < b.last.x:
+            EntityBH.seperateOnXAxis(a, b, weak)
+        else:
+            EntityBH.seperateOnXAxis(b, a, weak)
+        a.collideWith(b, 'x')
+        b.collideWith(a, 'x')
+
+@staticmethod
+def seperateOnXAxis(left, right, weak):
+    nudge = (left.pos.x + left.size.x - right.pos.x)
+    if weak
+        nudge = -nudge if weak == left else nudge
+        strong = right if left is weak else left
+        weak.vel.x = -weak.vel.x * weak.bounciness + strong.vel.x
+        resWeak = ig.game.collisionMap.trace(weak.pos.x, weak.pos.y, nudge, 0, weak.size.x, weak.size.y)
+        weak.pos.x = resWeak.pos.x
+    else:
+        v2 = (left.vel.x - right.vel.x) / 2
+        left.vel.x = -v2
+        right.vel.x = v2
+        resLeft = ig.game.collisionMap.trace(left.pos.x, left.pos.y, -nudge / 2, 0, left.size.x, left.size.y)
+        left.pos.x = resLeft.pos.x
+        resRight = ig.game.collisionMap.trace(right.pos.x, right.pos.y, nudge / 2, 0, right.size.x, right.size.y)
+        right.pos.x = resRight.pos.x
+
+@staticmethod
+def seperateOnYAxis(top, bottom, weak):
+    nudge = (top.pos.y + top.size.y - bottom.pos.y)
+    if weak:
+        strong = bottom if top is weak else top
+        weak.vel.y = -weak.vel.y * weak.bounciness + strong.vel.y
+        nudgeX = 0
+        if weak == top and abs(weak.vel.y - strong.vel.y) < weak.minBounceVelocity:
+            weak.standing = true
+            nudgeX = strong.vel.x * ig.system.tick
+            
+        nudge = -nudge if weak == top else nudge
+        resWeak = ig.game.collisionMap.trace(weak.pos.x, weak.pos.y, nudgeX, weak == top ? -nudge : nudge, weak.size.x, weak.size.y)
+        weak.pos.y = resWeak.pos.y
+        weak.pos.x = resWeak.pos.x
+        
+    elif bottom.standing or top.vel.y > 0:
+        resTop = ig.game.collisionMap.trace(top.pos.x, top.pos.y, 0, -(top.pos.y + top.size.y - bottom.pos.y), top.size.x, top.size.y)
+        top.pos.y = resTop.pos.y
+        if top.bounciness > 0 and top.vel.y > top.minBounceVelocity:
+            top.vel.y *= -top.bounciness
+
+        else:
+            top.standing = true
+            top.vel.y = 0
+
+    else:
+        v2 = (top.vel.y - bottom.vel.y) / 2
+        top.vel.y = -v2
+        bottom.vel.y = v2
+        nudgeX = bottom.vel.x * ig.system.tick
+        resTop = ig.game.collisionMap.trace(top.pos.x, top.pos.y, nudgeX, -nudge / 2, top.size.x, top.size.y)
+        top.pos.y = resTop.pos.y
+        resBottom = ig.game.collisionMap.trace(bottom.pos.x, bottom.pos.y, 0, nudge / 2, bottom.size.x, bottom.size.y)
+        bottom.pos.y = resBottom.pos.y

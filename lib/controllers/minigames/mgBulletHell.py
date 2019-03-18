@@ -32,7 +32,7 @@ class ImpactMap(object):
         else:
             return 0
         
-    setTile(x, y, tile):
+    def setTile(x, y, tile):
         tx = int(x / self.tilesize)
         ty = int(y / self.tilesize)
         if (tx >= 0 and tx < self.width) and (ty >= 0 and ty < self.height):

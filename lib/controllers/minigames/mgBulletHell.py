@@ -71,6 +71,7 @@ class EntityBH(object):
         self.vel = Coordinate(config['vx'], config['vy'])
         self.accel = Coordinate(config['ax'], config['ay'])
         self.maxvel = (-AxisDistance(**config['mv']), AxisDistance(**config['mv']))
+        self.bounciness = 1
         self.type = None
         self.checkAgainst = None
         self.collides = None
@@ -201,3 +202,16 @@ def seperateOnYAxis(top, bottom, weak):
         top.pos.y = resTop.pos.y
         resBottom = ig.game.collisionMap.trace(bottom.pos.x, bottom.pos.y, 0, nudge / 2, bottom.size.x, bottom.size.y)
         bottom.pos.y = resBottom.pos.y
+
+class EntityPlayer(EntityBH):
+    def __init__(self):
+        pass
+    
+class EntityParticle(EntityBH):
+    def __init__(self):
+        pass
+    
+class EntityEnemy(EntityBH):
+    def __init__(self):
+        pass
+    

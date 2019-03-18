@@ -147,6 +147,16 @@ class AxisDistance(object):
             't': {'t': self.tile},
         }
         return AxisDistance(**d[lvl])
+    
+    def limit(self, _min, _max):
+        if _min > self:
+            return _min
+            
+        elif _max < self:
+            return _max
+        
+        else:
+            return self
 
     def toTiles(self):
         return self.tile
@@ -579,6 +589,12 @@ class Coordinate(object):
             'xy': (-self.x, -self.y),
         }
         return Coordinate(*d[axis])
+    
+    def limit(self, _min, _max):
+        x = self.x.limit(_min, _max)
+        y = self.y.limit(_min, _max)
+        return Coordinate(x, y)
+        
 
     def toPixels(self):
         return (self.x.toPixels(), self.y.toPixels())

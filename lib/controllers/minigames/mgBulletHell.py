@@ -15,6 +15,29 @@ class Counter(object):
         n = self.cache
         self.cache += 1
         return n
+
+class ImpactMap(object):
+    def init(tilesize, data):
+        self.name = None
+        self.tilesize = tilesize #int
+        self.data = data #matrix
+        self.height = len(data)
+        self.width = len(data[0])
+
+    def getTile(x, y):
+        tx = int(x / self.tilesize)
+        ty = int(y / self.tilesize)
+        if (tx >= 0 and tx < self.width) and (ty >= 0 and ty < self.height):
+            return self.data[ty][tx]
+        else:
+            return 0
+        
+    setTile(x, y, tile):
+        tx = int(x / self.tilesize)
+        ty = int(y / self.tilesize)
+        if (tx >= 0 and tx < self.width) and (ty >= 0 and ty < self.height):
+            self.data[ty][tx] = tile
+
     
 class EntityBH(object):
     id = Counter()
@@ -155,7 +178,7 @@ class EntityBH(object):
             weak.pos.y = resWeak.pos.y
             weak.pos.x = resWeak.pos.x
             
-        else if (ig.game.gravity and (bottom.standing or top.vel.y > 0)):
+        elif (ig.game.gravity and (bottom.standing or top.vel.y > 0)):
             resTop = ig.game.collisionMap.trace(top.pos.x, top.pos.y, 0, -(top.pos.y + top.size.y - bottom.pos.y), top.size.x, top.size.y)
             top.pos.y = resTop.pos.y
             if (top.bounciness > 0 and top.vel.y > top.minBounceVelocity):

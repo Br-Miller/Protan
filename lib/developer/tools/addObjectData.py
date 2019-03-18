@@ -11,11 +11,6 @@ path = {
     'terrain': './dat/terrain.dat',
 }
 data = {}
-
-if __name__ = '__main__':
-    path = os.path.abspath('./../../')
-    os.chdir(path)
-    sys.path.append(path)
   
 
 def addEntity(d):
@@ -69,6 +64,9 @@ def main():
         
 
 if __name__ == '__main__':
+    path = os.path.abspath('./../../')
+    sys.path.append(path)
+    os.chdir(path)
     main()
 else:
     warn(Warning('This module is not meant to be imported'))

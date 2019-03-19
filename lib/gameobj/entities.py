@@ -104,7 +104,7 @@ class EntityOverworld(object):
       self.hasmoved = True
 
   def moveResultPos(self):
-    return self.pos.shiftDir(self.facing, self.moveSpeed)
+    return self.pos.copy().shiftDir(self.facing, self.moveSpeed)
 
   def canMoveTo(self, coord, board, entities):
     collisionBox = self.collisionBox(coord)

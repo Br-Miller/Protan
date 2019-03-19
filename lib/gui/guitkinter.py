@@ -14,11 +14,9 @@ if __name__ == '__main__':
     os.chdir('../')
 
 try:
-    from tkinter import Canvas, Tk
-    from tkinter import PhotoImage
+    from tkinter import Canvas, Tk, PhotoImage
 except ImportError:
-    from Tkinter import Canvas, Tk
-    from Tkinter import PhotoImage
+    from Tkinter import Canvas, Tk, PhotoImage
 
 from dat.reqImages import ReqImages #GET REQUIRED IMAGES
 from mixins.fileHandling import freader
@@ -413,24 +411,23 @@ class GuiBase(ComplexImage):
     """tkinter base gui module"""
     def __call__(self, objpath, call, *args, **kwargs):
         #try:
-        if objpath == 'update':
-            return self.update()
+        objpath = objpath.split('.')
+        
+        if objpath[0] not in self.images and len(objpath) == 1:
+            return self.__getattribute__(objpath[0])(*args, **kwargs)
 
-        obj = self.getimage(*objpath.split('.'))
+        obj = self.getimage(self.images[obj], *objpath[1:])
 
-        if call == False:
-            return obj
+        if call:
+            obj(*args, **kwargs)
+            self.layer()
+        
+        return obj
 
-        obj(*args, **kwargs)
-
-        self.layer()
         #except Exception as e:
         #  warnings.warn(Warning('Gui error: %s, %s' % (str(objpath), str(e))))
 
     def getimage(self, obj, *args):
-        return self.recursiveget(self.images[obj], *args)
-
-    def recursiveget(self, obj, *args):
         for i in args:
             obj = obj.__getattribute__(i)
         return obj
@@ -460,3 +457,7 @@ class GuiBase(ComplexImage):
     def update(self):
         self.layer()
         tk.update()
+    
+    def render(self):
+        self.layer()
+        tk.update_idletasks()

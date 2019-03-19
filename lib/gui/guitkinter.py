@@ -6,8 +6,9 @@ Placeholder for graphics
 import os
 import re
 import sys
+import time
 import warnings
-from time import sleep
+
 
 if __name__ == '__main__':
     sys.path.append(os.path.abspath('../'))
@@ -410,20 +411,43 @@ class ComplexImage(object):
 
 class Keyboard(object):
     instances = []
+    keys = 'a'
+    states = {
+        'pressed': {
+            True: 'held',
+            False: 'pressed'
+        },
+        'letgo': {
+            True: 'off',
+            False: 'letgo'
+        }
+    }
     def __del__(self):
         Keyboard.instances.remove(self)
         super(Keyboard, self).__del__()
         
-    def __init__(self):
-        self.cache = {}
-        self.timer = None #ADD TIMER
+    def __init__(self, fhz=60):
+        self.target = 1 // 60
+        self.cache = { c: ['letgo', time.clock() + self.target] for c in keys } #FOR EACH KEY CREATE TIMER
         Keyboard.instances.update(self)
-        
-    def update(self):
-        pass
 
-    def updateKey(self, key):
-        pass
+    def _updateKey(self, key, tipe):
+        key, tipe = key
+        if not(self.ispressed(key) or self.held(key)) and tipe == 'pressed':
+            self.cache[key][0] = 'pressed'
+            self.cache[key][1] = time.clock()
+
+        elif not(self.isletgo(key) or self.isoff(key)) and tipe == 'released':
+            self.cache[key][0] = 'letgo'
+            self.cache[key][1] = time.clock()
+            
+    def delta(self, key):
+        return time.clock() - self.cache[key][1] - self.target
+           
+    @staticmethod
+    def updateKey(key):
+        for i in Keyboard.instances:
+            i._updateKey(*key)
     
     def ispressed(self, key):
         return self.state(key) == 'pressed'
@@ -438,7 +462,21 @@ class Keyboard(object):
         return self.state(key) == 'letgo'
     
     def state(self, key):
-        return self.cache.get(key, 'off')[0]
+        s = self.cache[key][0]
+        c = self.delta(key) > self.target
+        return Keyboard.states[s][c]
+    
+    
+class UserInput(object):
+    def __init__(self):
+        self.keyboard = Keyboard()
+    
+    def handleKeyPress(self, event):
+        pass
+        
+    def handleKeyRelease(self, event):
+        pass
+        
         
             
 class GuiBase(ComplexImage):

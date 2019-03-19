@@ -123,6 +123,11 @@ class AxisDistance(object):
             return -AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
         return AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
 
+    def shift(self, t=0, px=0, sx=0):
+        self.tile += t  
+        self.pixel += px  
+        self.subpixel += sx  
+    
     def copy(self):
         return AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
     
@@ -388,21 +393,16 @@ class Coordinate(object):
         """Returns a new Coordinate instance, shifted this by arg coord"""
         assert isinstance(coord, Coordinate) or isinstance(y, AxisDistance), "incorrect type of arg coord: should be Coordinate or AxisDistance, is {}".format(type(coord))
         if y is not None: coord = Coordinate(coord, y)
-        x1, y1 = (self.x, self.y)
-        x2, y2 = (coord.x, coord.y)
-        x = x1 + x2
-        y = y1 + y2
-        return Coordinate(x, y)
+        self.x += coord.x
+        self.y += coord.y
 
     def shiftDir(self, direction, n):
         """Returns a new Coordinate instance, shifted in the given direction"""
         assert Direction.isDir(direction), "incorrect type of arg direction: should be a Direction, is {}".format(type(direction))
         assert isinstance(n, AxisDistance), 'incorrect type of arg n: should be type AxisDistance, is type {}'.format(type(n))
-        x, y = self.x, self.y
         direction = Direction(direction)
-        x += direction.dx * n
-        y += direction.dy * n
-        return Coordinate(x, y)
+        self.x += direction.dx * n
+        self.y += direction.dy * n
 
     def distTo(self, coord, total=True):
         """Returns this instances distance to the given coordinate.

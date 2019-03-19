@@ -176,22 +176,24 @@ class SpriteLoader():
         return img
 
     def load_sprites(self, name, info):
-        images = {}
-        spritesheet = self.loadSpritesheet(name)
-        info = self.SpritesheetInfo(info)
-        spriteinfo = info[2]
-        xlen = spritesheet.width() / info[0]
-        ylen = spritesheet.height()/ info[1]
+        imges = {}
+        sheet = self.loadSpritesheet(name)
+        rdata = self.SpritesheetInfo(info)
+        sdata = rdata[2]
+        width = sheet.width() / rdata[0]
+        height = sheet.height()/ rdata[1]
         for s in spriteinfo:
             try:
-                l = int(spriteinfo[s][0] * xlen)
-                t = int(spriteinfo[s][1] * ylen)
-                r, b = int(l + xlen), int(t + ylen)
-                images.update( { str(ImageName(s)): self.subimage(spritesheet, l, t, r, b) } )
+                l = int(spdata[s][0] * width )
+                t = int(spdata[s][1] * height)
+                r = int(l + width )
+                b = int(t + height)
+                imges.update( { str(ImageName(s)): self.subimage(sheet, l, t, r, b) } )
+                
             except Exception as e:
-                print e
-                images.update( { str(ImageName(s)): self.baseImages['missing_texture'] } )
-        return images
+                imges.update( { str(ImageName(s)): self.baseImages['missing_texture'] } )#logit
+                
+        return imges
 
 class SpriteDict(SpriteLoader, object):
     """Image Dictionary"""
@@ -406,6 +408,38 @@ class ComplexImage(object):
         for i in self.images: 
             i.hide()
 
+class Keyboard(object):
+    instances = []
+    def __del__(self):
+        Keyboard.instances.remove(self)
+        super(Keyboard, self).__del__()
+        
+    def __init__(self):
+        self.cache = {}
+        self.timer = None #ADD TIMER
+        Keyboard.instances.update(self)
+        
+    def update(self):
+        pass
+
+    def updateKey(self, key):
+        pass
+    
+    def ispressed(self, key):
+        return self.state(key) == 'pressed'
+    
+    def isheld(self, key):
+        return self.state(key) == 'held'
+    
+    def isoff(self, key):
+        return self.state(key) == 'off'
+    
+    def isletgo(self, key):
+        return self.state(key) == 'letgo'
+    
+    def state(self, key):
+        return self.cache.get(key, 'off')[0]
+        
             
 class GuiBase(ComplexImage):
     """tkinter base gui module"""

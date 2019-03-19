@@ -10,8 +10,8 @@ from warnings import warn
 
 
 class AxisDistance(object):
-    """Outputs distance and saves space
-    Immutable
+    """Length along an axis
+    Measures distance in tiles, pixels and subpixels
     """
     tilesize = 32
     pixelsize = 8
@@ -31,22 +31,27 @@ class AxisDistance(object):
         self.cleanup()
         super(AxisDistance, self).__init__()
 
-    def __iter__(self): #TO TUPLE
+    def __iter__(self):
+        """x.__iter__() <=> iter(x)"""
         return iter((self.tile, self.pixel, self.subpixel))
 
-    def __str__(self): #TO STRING
+    def __str__(self):
+        """x.__str__() <=> str(x)"""
         return '{}.{}.{}'.format(self.tile, self.pixel, self.subpixel)
 
-    def __repr__(self): #TO Human STRING
+    def __repr__(self):
+        """x.__repr__() <=> repr(x)"""
         return '{}t{}px{}sx'.format(self.tile, self.pixel, self.subpixel)
 
     @classmethod
     def fromStr(cls, s):
+        """Generates an AxisDistance instance from a string"""
         assert isinstance(s, str), 'incorrect type of arg s: should be type str, is type {}'.format(type(s))
         s = [ int(n) for n in s.split('.') ]
         return cls(*s)
 
     def __add__(self, x):
+        """x.__add__(y) <=> x + y"""
         assert isinstance(x, AxisDistance), 'incorrect type of arg x: should be type AxisDistance, is type {}'.format(type(x))
         tile = self.tile + x.tile
         pixel = self.pixel + x.pixel
@@ -54,19 +59,23 @@ class AxisDistance(object):
         return AxisDistance(t=tile, px=pixel, sx=subpixel)
 
     def __hash__(self):
+        """x.__hash__() <=> hash(x)"""
         return hash(tuple(self))
 
     def __neg__(self):
+        """x.__neg__() <=> -x"""
         tile = -self.tile
         pixel = -self.pixel
         subpixel = -self.subpixel
         return AxisDistance(t=tile, px=pixel, sx=subpixel)
 
     def __rmul__(self, x):
+        """x.__rmul__(y) <=> y * x"""
         assert isinstance(x, int), 'incorrect type of arg x: should be type int, is type {}'.format(type(x))
         return self.__mul__(x)
 
     def __mul__(self, x):
+        """x.__mul__(y) <=> x * y"""
         assert isinstance(x, int) or isinstance(x, float), 'incorrect type of arg x: should be type int or float, is type {}'.format(type(x))
         tile = int(self.tile * x)
         pixel = int(self.pixel * x)
@@ -74,6 +83,7 @@ class AxisDistance(object):
         return AxisDistance(t=tile, px=pixel, sx=subpixel)
 
     def __sub__(self, x):
+        """x.__sub__(y) <=> x - y"""
         assert isinstance(x, AxisDistance), 'incorrect type of arg x: should be type AxisDistance, is type {}'.format(type(x))
         tile = self.tile - x.tile
         pixel = self.pixel - x.pixel
@@ -81,6 +91,7 @@ class AxisDistance(object):
         return self.AxisDistance(t=tile, px=pixel, sx=subpixel)
 
     def __cmp__(self, x):
+        """x.__cmp__(y) <=> cmp(x, y)"""
         assert isinstance(x, AxisDistance), 'incorrect type of arg x: should be type AxisDistance, is type {}'.format(type(x))
         a = [
             cmp(self.tile, x.tile),
@@ -93,6 +104,7 @@ class AxisDistance(object):
         return 0
 
     def __eq__(self, x):
+        """x.__eq__(y) <=> x == y"""
         assert isinstance(x, AxisDistance), 'incorrect type of arg x: should be type AxisDistance, is type {}'.format(type(x))
         return self.__cmp__(x) == 0
 
@@ -124,6 +136,7 @@ class AxisDistance(object):
         return AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
 
     def shift(self, t=0, px=0, sx=0):
+        """Shifts this instance by the set amount"""
         self.tile += t  
         self.pixel += px  
         self.subpixel += sx  

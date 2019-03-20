@@ -112,14 +112,57 @@ class SpriteEditor():
     """Sprite editing functions"""
     @staticmethod
     def rotateImage(image, degrees):
+        degrees = SpriteEditor._posdegree(degrees)
         d = {
             0: lamda x, d: x,
-            90: 'FUNCTION',
+            90: SpriteEditor._turnImage,
             180: 'FUNCTION',
-            270: 'FUNCTION'
+            270: SpriteEditor._turnImage
         }
         func = d.get(degrees, SpriteEditor._rotateImage)
         return func(image, degrees)
+    
+    @staticmethod
+    def _posdegree(degrees):
+        while degrees < 0:
+            degrees += 360
+        return degrees
+    
+    @staticmethod
+    def _flipImage(image, degrees, axis='y'):
+        assert degrees == 180, 'degrees should be 180: is {}'.format(degrees)
+        func = {
+            'x': lambda x, y: image.width() - x, y,
+            'y': lambda x, y: x, image.height() - y
+        }
+        func = func[axis]
+        w = image.width()
+        h = image.height()
+        newimage = PhotoImage(width=w, height=h)
+        for x in range(w):
+            for y in range(h):
+                dx, dy = func(x, y)
+                rgb = SpriteEditor.getpixel(image, x, y)
+                SpriteEditor.setpixel(newimage, dx, dy, *rgb)
+            
+    @staticmethod
+    def _turnImage(image, degrees):
+        assert degrees == 90 or degrees == 270, 'degrees should be 90 or 270: is {}'.format(degrees)
+        w = image.width()
+        h = image.height()
+        func = {
+            90: lambda x, y: h - y, x,
+            270: lambda x, y: y, w - x
+        }
+        func = func[degrees]
+        newimage = PhotoImage(width=h, height=w)
+        
+        for x in range(w):
+            for y in range(h):
+                dx, dy = func(x, y)
+                rgb = SpriteEditor.getpixel(image, x, y)
+                SpriteEditor.setpixel(newimage, dx, dy, *rgb)
+        return newimage
         
     @staticmethod
     def _rotateImage(image, degrees):

@@ -109,7 +109,28 @@ class ImageName(object):
 #--------------------------------------------------------------------
 
 class SpriteEditor():
-    """docstring for SpriteEditor"""
+    """Sprite editing functions"""
+    @staticmethod
+    def rotateImage(image, degrees):
+        d = {
+            0: lamda x, d: x,
+            90: 'FUNCTION',
+            180: 'FUNCTION',
+            270: 'FUNCTION'
+        }
+        func = d.get(degrees, SpriteEditor._rotateImage)
+        return func(image, degrees)
+        
+    @staticmethod
+    def _rotateImage(image, degrees):
+        radians = degrees * math.pi / 180
+        tangent = -math.tan(radians/2)
+        sine = math.sin(radians)
+        image = SpriteEditor.shearImage(image, tangent, 'x')
+        image = SpriteEditor.shearImage(image, sine, 'y')
+        image = SpriteEditor.shearImage(image, tangent, 'x')
+        return image
+        
     @staticmethod
     def shearImage(image, gamma, axis):
         d = {

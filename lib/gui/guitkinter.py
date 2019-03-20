@@ -37,31 +37,6 @@ class ActiveError(GuiError):
         
 #--------------------------------------------------------------------
 
-#    def getpixel(self, image, x, y):
-#        """Change image pixel to color r, b, g)."""
-#        assert isinstance(image, PhotoImage), 'incorrect type of arg image: should be type PhotoImage, is type {}'.format(type(image))
-#        assert isinstance(x, int), 'incorrect type of arg x: should be type int, is type {}'.format(type(x))
-#        assert isinstance(y, int), 'incorrect type of arg y: should be type int, is type {}'.format(type(y))
-#        return image.get(x, y)#
-
-#    def setpixel(self, image, x, y, r, b, g):
-#        """Change image pixel to color r, b, g)."""
-#        assert isinstance(image, PhotoImage), 'incorrect type of arg image: should be type PhotoImage, is type {}'.format(type(image))
-#        hexcode = "{#%02x%02x%02x}" % (r, g, b)
-#        image.put(hexcode, to=(x, y))#
-
-#    def fill(self):
-#        """Fill image with a color=(r,b,g)."""
-#        r, g, b = (self.red.get(), self.green.get(), self.blue.get())
-#        width = self._image.width()
-#        height = self._image.height()
-#        hexcode = "#%02x%02x%02x" % (r, g, b)
-#        horizontal_line = "{" + " ".join([hexcode] * width) + "}"
-#        self._image.put(" ".join([horizontal_line] * height))    
-        
-
-#--------------------------------------------------------------------
-
 class ImageName(object):
     """Generalises image names"""
     optionHeader = '  -'
@@ -132,6 +107,91 @@ class ImageName(object):
         return d['name'], d['shade'], d['xsize'], d['ysize']
 
 #--------------------------------------------------------------------
+
+class SpriteEditor():
+    """docstring for SpriteEditor"""
+    @staticmethod
+    def shearImage(image, gamma, axis):
+        d = {
+            'x': SpriteEditor.shearImageX,
+            'y': SpriteEditor.shearImageY
+        }
+        func = d[axis]
+        return func(image, gamma)
+
+    @staticmethod
+    def shearImageX(image, gamma):
+        yresize = image.height()
+        xresize = int(image.width() * (abs(gamma) + 1))
+        newimag = PhotoImage(width=xresize, height=yresize)
+        shftdir = {True: 0, False: image.height()}[(gamma < 0)]
+        lnshift = lambda z: abs(gamma) * abs(shftdir - z)
+
+        for y in range(image.height()):
+            shift = lnshift(y)
+            for x in range(image.width()):
+                rgb = SpriteEditor.getpixel(image, x, y)
+                if rgb != (0, 0, 0):
+                    SpriteEditor.setpixel(newimag, int(x + shift), y, *rgb)
+        return newimag
+
+    @staticmethod
+    def shearImageY(image, gamma):
+        xresize = image.width()
+        yresize = int(image.height() * (abs(gamma) + 1))
+        newimag = PhotoImage(width=xresize, height=yresize)
+        shftdir = {True: 0, False: image.width()}[(gamma < 0)]
+        lnshift = lambda z: abs(gamma) * abs(shftdir - z)
+        for x in range(image.width()):
+            shift = lnshift(x)
+
+            for y in range(image.height()):
+                rgb = SpriteEditor.getpixel(image, x, y)
+                if rgb != (0, 0, 0):
+                    SpriteEditor.setpixel(newimag, x, int(y + shift), *rgb)
+        return newimag
+
+    @staticmethod
+    def _resize(image, x=1, y=1):
+        """Resizes and image"""
+        assert isinstance(image, PhotoImage), 'incorrect type of arg image: should be type PhotoImage, is type {}'.format(type(image))
+        return image.zoom(x, y=y)
+
+    @staticmethod
+    def getpixel(image, x, y):
+        r, b, g = [ int(i) for i in image.get(x, y).split(' ') ]
+        return r, b, g
+
+    @staticmethod
+    def setpixel(image, x, y, r, g, b):
+        """Change image pixel to color r, b, g"""
+        hexcode = "{#%02x%02x%02x}" % (r, g, b)
+        image.put(hexcode, to=(x, y))
+
+    def fill(self):
+        """Fill image with a color=(r,b,g)
+        Unused
+        """
+        r, g, b = (self.red.get(), self.green.get(), self.blue.get())
+        width = self._image.width()
+        height = self._image.height()
+        hexcode = "#%02x%02x%02x" % (r, g, b)
+        horizontal_line = "{" + " ".join([hexcode] * width) + "}"
+        self._image.put(" ".join([horizontal_line] * height))
+
+    @staticmethod
+    def _shadeimg(image, shade=0):
+        assert isinstance(image, PhotoImage), 'incorrect type of arg image: should be type PhotoImage, is type {}'.format(type(image))
+        shade = 1 - (shade / 100.0)
+        image = image.copy()
+        
+        for x in range(image.width()):
+            for y in range(image.height()):
+                s = map(lambda i: int(i), image.get(x, y).split(' '))
+                s = map(lambda i: int(i * shade), s)
+                hexcode = "#%02x%02x%02x" % tuple(s)
+                image.put("{%s}" % (hexcode), to=(x, y))
+        return image
 
 class SpriteLoader():
     """Mix in for loading spritesheets, split for readablility"""
@@ -225,24 +285,6 @@ class SpriteDict(SpriteLoader, object):
         self.baseImages.update( self.blank() )
         for s in ReqImages:
             self.baseImages.update( self.load_sprites(s, ReqImages[s]) )
-
-    def _resize(self, image, x=1, y=1):
-        """Resizes and image"""
-        assert isinstance(image, PhotoImage), 'incorrect type of arg image: should be type PhotoImage, is type {}'.format(type(image))
-        return image.zoom(x, y=y)
-
-    def _shadeimg(self, image, shade=0):
-        assert isinstance(image, PhotoImage), 'incorrect type of arg image: should be type PhotoImage, is type {}'.format(type(image))
-        shade = 1 - (shade / 100.0)
-        image = image.copy()
-        
-        for x in range(image.width()):
-            for y in range(image.height()):
-                s = map(lambda i: int(i), image.get(x, y).split(' '))
-                s = map(lambda i: int(i * shade), s)
-                hexcode = "#%02x%02x%02x" % tuple(s)
-                image.put("{%s}" % (hexcode), to=(x, y))
-        return image
 
     def editImage(self, image):
         assert isinstance(image, ImageName), 'incorrect type of arg image: should be type ImageName, is type {}'.format(type(image))

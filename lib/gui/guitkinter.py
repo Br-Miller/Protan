@@ -59,7 +59,7 @@ class ImageName(object):
         self.shade = shade
         self.xsize = xsize
         self.ysize = ysize
-        self.rspin = sprites.getResolution(name, xsize, ysize, rspin)
+        self.rspin = sprites.rspinRes(name, xsize, ysize, rspin)
 
     def __hash__(self):
         return hash(str(self))
@@ -124,7 +124,7 @@ class SpriteEditor():
             return d[imageLen]
         
         rad = math.atan(float(pixels) / imageLen)
-        deg = math.toDeg(rad)
+        deg = math.degrees(rad)
         res = max([ i for i in SpriteEditor.resolutions if i < deg ])
         d.update({imageLen: res})
         return res
@@ -195,7 +195,7 @@ class SpriteEditor():
         
     @staticmethod
     def _rotateImage(image, degrees):
-        radians = degrees * math.pi / 180
+        radians = math.radians(degrees)
         tangent = -math.tan(radians/2)
         sine = math.sin(radians)
         image = SpriteEditor.shearImage(image, tangent, 'x')
@@ -372,13 +372,14 @@ class SpriteDict(SpriteLoader, object):
             return imageInst
 
     def __init__(self):
+        self.tiltres = {}
         self.baseImages = {}
         self.editedImages = {}
         self.baseImages.update( self.missing_tex() )
         self.baseImages.update( self.blank() )
         for s in ReqImages:
             self.baseImages.update( self.load_sprites(s, ReqImages[s]) )
-
+            
     def editImage(self, image):
         assert isinstance(image, ImageName), 'incorrect type of arg image: should be type ImageName, is type {}'.format(type(image))
         imageInst = self.getBaseImage(image).copy()
@@ -391,11 +392,29 @@ class SpriteDict(SpriteLoader, object):
         assert isinstance(image, ImageName), 'incorrect type of arg image: should be type ImageName, is type {}'.format(type(image))
         return self.baseImages.get(str(image.base()), self.baseImages['missing_texture'])
     
-    def getResolution(self, name, xsize, ysize, rspin):
-        img = ImageName(name=name, xsize=xsize, ysize=ysize)
-        img = self[img]
-        res = self.imageRes(img, rspin)
-        return res
+    def rspinRes(self, name, xsize, ysize, deg, pixel=2):
+        """Adjusts the degree of rotation"""
+        res = self.degreeRotation(name, xsize, ysize, pixel=pixel)
+        dif = deg % res
+        deg -= dif
+        if dif > res / 2.0:
+            deg += res
+        return int(deg)
+    
+    def degreeRotation(self, name, xsize, ysize, pixel=2):
+        """Returns the maximum noticable shift"""
+        img = self[ImageName(name=name, xsize=xsize, ysize=ysize)]
+        w = image.width() * xsize
+        h = image.height() * ysize
+        l = max([w, h])
+        
+        if l not in self.tiltres:
+            a = math.atan(float(pixel) / l
+            a = math.degrees(a)
+            res = max([ i for i in SpriteEditor.resolutions if i < deg or i == 1 ])
+            self.tiltres.update({l: res})
+        return self.tiltres[l]
+                         
 
     
 class _ImageDictionary():

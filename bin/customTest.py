@@ -16,8 +16,8 @@ from gui.guiMain import Gui
 
 gui = Gui()
 gui('board.show', True)
-entityA = EntityOverworld(Coordinate((0, 0, 0), (0, 0, 0)), {'name': 'amberSoldier', 'facing': 'n', 'moveSpeed': {'t': 0, 'px': 2, 'sx': 0}, 'customHitbox': None})
-entityB = EntityOverworld(Coordinate((7, 0, 0), (7, 0, 0)), {'name': 'debug1', 'facing': 's', 'moveSpeed': {'t': 0, 'px': 2, 'sx': 0}, 'customHitbox': None})
+entityA = EntityOverworld(Coordinate((0, 0, 0), (0, 0, 0)), {'id':'amberSoldier' , 'name': 'amberSoldier', 'facing': 'n', 'move': {'t': 0, 'px': 2, 'sx': 0}, 'customHitbox': None})
+entityB = EntityOverworld(Coordinate((7, 0, 0), (7, 0, 0)), {'id': 'debug1', 'name': 'debug1', 'facing': 's', 'move': {'t': 0, 'px': 2, 'sx': 0}, 'customHitbox': None})
 board = MapArea(AxisDistance(t=30), AxisDistance(t=20), b='.debug1')
 entities = [entityA, entityB]
 

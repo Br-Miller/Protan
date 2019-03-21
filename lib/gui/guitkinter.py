@@ -116,6 +116,12 @@ class SpriteEditor():
     """Sprite editing functions"""
     resolutions = [1, 2, 3, 5, 6, 9, 10, 15, 30, 45, 90]
     @staticmethod
+    def cropimage(image, l, t, r, b):
+        img = PhotoImage()
+        img.tk.call(img, 'copy', spritesheet, '-from', l, t, r, b, '-to', 0, 0)
+        return img
+    
+    @staticmethod
     def _flipImage(image, degrees, axis='y'):
         assert degrees == 180, 'degrees should be 180: is {}'.format(degrees)
         func = {
@@ -133,13 +139,16 @@ class SpriteEditor():
                 SpriteEditor.setpixel(newimage, dx, dy, *rgb)
         
     @staticmethod
-    def _rotateImage(image, degrees):
+    def _rotateImage(image, degrees, crop=True):
+        w = image.width()
+        h = image.height()
         radians = math.radians(degrees)
         tangent = -math.tan(radians/2)
         sine = math.sin(radians)
         image = SpriteEditor.shearImage(image, tangent, 'x')
         image = SpriteEditor.shearImage(image, sine, 'y')
         image = SpriteEditor.shearImage(image, tangent, 'x')
+        image = SpriteEditor.cropCentre(image, w, h)
         return image
     
     @staticmethod
@@ -162,6 +171,17 @@ class SpriteEditor():
         return newimage
     
     @staticmethod
+    def cropCentre(image, w, h):
+        wnew = image.width()
+        hnew = image.height()
+        x1 = (wnew - w) / 2
+        y1 = (hnew - h) / 2
+        x2 = x1 + w
+        y2 = y1 + h
+        image = SpriteEditor.cropimage(image, x1, y1, x2, y2)
+        return image
+    
+    @staticmethod
     def constDegree(degrees):
         while degrees < 0:
             degrees += 360
@@ -170,7 +190,7 @@ class SpriteEditor():
         return degrees
     
     @staticmethod
-    def rotateimg(image, degrees):
+    def rotateimg(image, degrees, crop=True):
         degrees = SpriteEditor.constDegree(degrees)
         d = {
             0: lambda x, d: x,
@@ -179,7 +199,7 @@ class SpriteEditor():
             270: SpriteEditor._turnImage
         }
         func = d.get(degrees, SpriteEditor._rotateImage)
-        return func(image, degrees)
+        return func(image, degrees, crop=crop)
         
     @staticmethod
     def shearImage(image, gamma, axis):

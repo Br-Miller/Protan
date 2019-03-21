@@ -73,7 +73,7 @@ class ImageName(object):
         xsize = self.optionHeader + 'x' + str(self.xsize)
         ysize = self.optionHeader + 'y' + str(self.ysize)
         rspin = self.optionHeader + 'r' + str(self.rspin) 
-        return '{} {}{}{}'.format(name, shade, xsize, ysize, rspin) 
+        return '{} {}{}{}{}'.format(name, shade, xsize, ysize, rspin) 
 
     def base(self):
         """Returns the base name of this image"""

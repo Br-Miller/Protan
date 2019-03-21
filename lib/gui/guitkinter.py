@@ -46,18 +46,20 @@ class ImageName(object):
         's': 'shade',
         'x': 'xsize',
         'y': 'ysize',
+        'r': 'rspin'
     }
-    def __init__(self, s=None, name=None, shade=0, xsize=1, ysize=1):
+    def __init__(self, s=None, name=None, shade=0, xsize=1, ysize=1, rspin=0):
         if isinstance(s, str):
-            name, shade, xsize, ysize = self.expandString(s)
+            name, shade, xsize, ysize, rspin = self.expandString(s)
 
         elif isinstance(s, ImageName):
-            name, shade, xsize, ysize = s.name, s.shade, s.xsize, s.ysize
+            name, shade, xsize, ysize = s.name, s.shade, s.xsize, s.ysize, s.rspin
 
         self.name = name
         self.shade = shade
         self.xsize = xsize
         self.ysize = ysize
+        self.rspin = sprites.getResolution(name, xsize, ysize, rspin)
 
     def __hash__(self):
         return hash(str(self))
@@ -70,7 +72,8 @@ class ImageName(object):
         shade = self.optionHeader + 's' + str(self.shade)
         xsize = self.optionHeader + 'x' + str(self.xsize)
         ysize = self.optionHeader + 'y' + str(self.ysize)
-        return '{} {}{}{}'.format(name, shade, xsize, ysize)
+        rspin = self.optionHeader + 'r' + str(self.rspin) 
+        return '{} {}{}{}'.format(name, shade, xsize, ysize, rspin) 
 
     def base(self):
         """Returns the base name of this image"""
@@ -100,11 +103,12 @@ class ImageName(object):
             'shade': 0,
             'xsize': 1,
             'ysize': 1,
+            'rspin': 0
         }
         d.update({'name': re.search(ImageName.imageNameRegex, s).group()})
         options = re.findall(ImageName.optionSuffixRegex, s)
         for s in options: d.update(ImageName.getArgs(s))
-        return d['name'], d['shade'], d['xsize'], d['ysize']
+        return d['name'], d['shade'], d['xsize'], d['ysize'], d['rspin']
 
 #--------------------------------------------------------------------
 
@@ -136,7 +140,7 @@ class SpriteEditor():
         return int(deg)
          
     @staticmethod
-    def rotateImage(image, degrees):
+    def rotateimg(image, degrees):
         degrees = SpriteEditor._posdegree(degrees)
         d = {
             0: lamda x, d: x,
@@ -356,8 +360,8 @@ class SpriteDict(SpriteLoader, object):
 
     def __getitem__(self, image):
         assert isinstance(image, str) or isinstance(image, ImageName), 'incorrect type of arg image: should be type str or ImageName, is type {}'.format(type(image))
-        image = ImageName(s=image)
-        if image in self:
+        img = ImageName(s=image)
+        if img in self:
             base = self.baseImages.get(str(image), None)
             edit = self.editedImages.get(str(image), None)
             return base or edit or 'missing_texture'
@@ -380,12 +384,20 @@ class SpriteDict(SpriteLoader, object):
         imageInst = self.getBaseImage(image).copy()
         imageInst = self._resize(imageInst, x=image.xsize, y=image.ysize)
         imageInst = self._shadeimg(imageInst, shade=image.shade)
+        imageInst = self.rotateimg(imageInst, deg=image.rspin)
         return imageInst
 
     def getBaseImage(self, image):
         assert isinstance(image, ImageName), 'incorrect type of arg image: should be type ImageName, is type {}'.format(type(image))
         return self.baseImages.get(str(image.base()), self.baseImages['missing_texture'])
+    
+    def getResolution(self, name, xsize, ysize, rspin):
+        img = ImageName(name=name, xsize=xsize, ysize=ysize)
+        img = self[img]
+        res = self.imageRes(img, rspin)
+        return res
 
+    
 class _ImageDictionary():
     """Image handling class"""
     def __init__(self):

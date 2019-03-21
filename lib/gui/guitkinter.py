@@ -235,12 +235,12 @@ class SpriteEditor():
 
     @staticmethod
     def setpixel(image, x, y, r, g, b):
-        """Change image pixel to color r, b, g"""
+        """Change image pixel to color r, g, b"""
         hexcode = "{#%02x%02x%02x}" % (r, g, b)
         image.put(hexcode, to=(x, y))
 
     def fill(self):
-        """Fill image with a color=(r,b,g)
+        """Fill image with a color=(r, g, b)
         Unused
         """
         r, g, b = (self.red.get(), self.green.get(), self.blue.get())

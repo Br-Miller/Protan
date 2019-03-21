@@ -115,48 +115,6 @@ class ImageName(object):
 class SpriteEditor():
     """Sprite editing functions"""
     resolutions = [1, 2, 3, 5, 6, 9, 10, 15, 30, 45, 90]
-    imageResCache = {}
-    @staticmethod
-    def _imageRes(imageLen, pixels=2):
-        """calculates the maximum noticable shift"""
-        d = SpriteEditor.imageResCache
-        if imageLen in d.keys():
-            return d[imageLen]
-        
-        rad = math.atan(float(pixels) / imageLen)
-        deg = math.degrees(rad)
-        res = max([ i for i in SpriteEditor.resolutions if i < deg ])
-        d.update({imageLen: res})
-        return res
-    
-    @staticmethod
-    def imageRes(image, deg, pixels=2):
-        l = max([image.width(), image.height()])
-        res = SpriteEditor._imageRes(l, pixels)
-        dif = deg % res
-        deg -= dif
-        if diff > res / 2.0:
-            deg += res
-        return int(deg)
-         
-    @staticmethod
-    def rotateimg(image, degrees):
-        degrees = SpriteEditor._posdegree(degrees)
-        d = {
-            0: lambda x, d: x,
-            90: SpriteEditor._turnImage,
-            180: 'FUNCTION',
-            270: SpriteEditor._turnImage
-        }
-        func = d.get(degrees, SpriteEditor._rotateImage)
-        return func(image, degrees)
-    
-    @staticmethod
-    def _posdegree(degrees):
-        while degrees < 0:
-            degrees += 360
-        return degrees
-    
     @staticmethod
     def _flipImage(image, degrees, axis='y'):
         assert degrees == 180, 'degrees should be 180: is {}'.format(degrees)
@@ -173,7 +131,17 @@ class SpriteEditor():
                 dx, dy = func(x, y)
                 rgb = SpriteEditor.getpixel(image, x, y)
                 SpriteEditor.setpixel(newimage, dx, dy, *rgb)
-            
+        
+    @staticmethod
+    def _rotateImage(image, degrees):
+        radians = math.radians(degrees)
+        tangent = -math.tan(radians/2)
+        sine = math.sin(radians)
+        image = SpriteEditor.shearImage(image, tangent, 'x')
+        image = SpriteEditor.shearImage(image, sine, 'y')
+        image = SpriteEditor.shearImage(image, tangent, 'x')
+        return image
+    
     @staticmethod
     def _turnImage(image, degrees):
         assert degrees == 90 or degrees == 270, 'degrees should be 90 or 270: is {}'.format(degrees)
@@ -192,16 +160,26 @@ class SpriteEditor():
                 rgb = SpriteEditor.getpixel(image, x, y)
                 SpriteEditor.setpixel(newimage, dx, dy, *rgb)
         return newimage
-        
+    
     @staticmethod
-    def _rotateImage(image, degrees):
-        radians = math.radians(degrees)
-        tangent = -math.tan(radians/2)
-        sine = math.sin(radians)
-        image = SpriteEditor.shearImage(image, tangent, 'x')
-        image = SpriteEditor.shearImage(image, sine, 'y')
-        image = SpriteEditor.shearImage(image, tangent, 'x')
-        return image
+    def constDegree(degrees):
+        while degrees < 0:
+            degrees += 360
+        while degrees > 360
+            degrees -= 360
+        return degrees
+    
+    @staticmethod
+    def rotateimg(image, degrees):
+        degrees = SpriteEditor.constDegree(degrees)
+        d = {
+            0: lambda x, d: x,
+            90: SpriteEditor._turnImage,
+            180: 'FUNCTION',
+            270: SpriteEditor._turnImage
+        }
+        func = d.get(degrees, SpriteEditor._rotateImage)
+        return func(image, degrees)
         
     @staticmethod
     def shearImage(image, gamma, axis):

@@ -408,6 +408,7 @@ class Coordinate(object):
         if y is not None: coord = Coordinate(coord, y)
         self.x += coord.x
         self.y += coord.y
+        return self
 
     def shiftDir(self, direction, n):
         """Returns a new Coordinate instance, shifted in the given direction"""
@@ -416,6 +417,7 @@ class Coordinate(object):
         direction = Direction(direction)
         self.x += direction.dx * n
         self.y += direction.dy * n
+        return self
 
     def distTo(self, coord, total=True):
         """Returns this instances distance to the given coordinate.

@@ -110,6 +110,31 @@ class ImageName(object):
 
 class SpriteEditor():
     """Sprite editing functions"""
+    resolutions = [1, 2, 3, 5, 6, 9, 10, 15, 30, 45, 90]
+    imageResCache = {}
+    @staticmethod
+    def _imageRes(imageLen, pixels=2):
+        """calculates the maximum noticable shift"""
+        d = SpriteEditor.imageResCache
+        if imageLen in d.keys():
+            return d[imageLen]
+        
+        rad = math.atan(float(pixels) / imageLen)
+        deg = math.toDeg(rad)
+        res = max([ i for i in SpriteEditor.resolutions if i < deg ])
+        d.update({imageLen: res})
+        return res
+    
+    @staticmethod
+    def imageRes(image, deg, pixels=2):
+        l = max([image.width(), image.height()])
+        res = SpriteEditor._imageRes(l, pixels)
+        dif = deg % res
+        deg -= dif
+        if diff > res / 2.0:
+            deg += res
+        return int(deg)
+         
     @staticmethod
     def rotateImage(image, degrees):
         degrees = SpriteEditor._posdegree(degrees)

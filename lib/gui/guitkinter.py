@@ -195,7 +195,7 @@ class SpriteEditor():
         d = {
             0: lambda x, d: x,
             90: SpriteEditor._turnImage,
-            180: 'FUNCTION',
+            180: SpriteEditor._flipImage,
             270: SpriteEditor._turnImage
         }
         func = d.get(degrees, SpriteEditor._rotateImage)

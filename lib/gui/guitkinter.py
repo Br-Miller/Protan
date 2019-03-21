@@ -6,6 +6,7 @@ Placeholder for graphics
 import os
 import re
 import sys
+import math
 import time
 import warnings
 
@@ -52,7 +53,7 @@ class ImageName(object):
             name, shade, xsize, ysize, rspin = self.expandString(s)
 
         elif isinstance(s, ImageName):
-            name, shade, xsize, ysize = s.name, s.shade, s.xsize, s.ysize, s.rspin
+            name, shade, xsize, ysize, rspin = s.name, s.shade, s.xsize, s.ysize, s.rspin
 
         self.name = name
         self.shade = shade
@@ -326,7 +327,7 @@ class SpriteLoader():
                 
         return imges
 
-class SpriteDict(SpriteLoader, object):
+class SpriteDict(SpriteLoader, SpriteEditor, object):
     """Image Dictionary"""
     def __contains__(self, x):
         x = str(x)
@@ -340,13 +341,13 @@ class SpriteDict(SpriteLoader, object):
         img = ImageName(s=image)
         img.res = self.rspinRes(img.name, img.xsize, img.ysize, img.rspin)
         if img in self:
-            base = self.baseImages.get(str(image), None)
-            edit = self.editedImages.get(str(image), None)
-            return base or edit or 'missing_texture'
+            base = self.baseImages.get(str(img), None)
+            edit = self.editedImages.get(str(img), None)
+            return base or edit or self.baseImages['missing_texture']
 
         else:
-            imageInst = self.editImage(image)
-            self.editedImages.update({str(image): imageInst})
+            imageInst = self.editImage(img)
+            self.editedImages.update({str(img): imageInst})
             return imageInst
 
     def __init__(self):
@@ -363,7 +364,7 @@ class SpriteDict(SpriteLoader, object):
         imageInst = self.getBaseImage(image).copy()
         imageInst = self._resize(imageInst, x=image.xsize, y=image.ysize)
         imageInst = self._shadeimg(imageInst, shade=image.shade)
-        imageInst = self.rotateimg(imageInst, deg=image.rspin)
+        imageInst = self.rotateimg(imageInst, image.rspin)
         return imageInst
 
     def getBaseImage(self, image):
@@ -381,15 +382,15 @@ class SpriteDict(SpriteLoader, object):
     
     def degreeRotation(self, name, xsize, ysize, pixel=2):
         """Returns the maximum noticable shift"""
-        img = self[ImageName(name=name, xsize=xsize, ysize=ysize)]
+        image = self.baseImages.get(ImageName(name=name, xsize=xsize, ysize=ysize), self.baseImages['missing_texture'])
         w = image.width() * xsize
         h = image.height() * ysize
-        l = max([w, h])
+        l = max([w, h]) or 1
         
         if l not in self.tiltres:
             a = math.atan(float(pixel) / l)
             a = math.degrees(a)
-            res = max([ i for i in SpriteEditor.resolutions if i < deg or i == 1 ])
+            res = max([ i for i in SpriteEditor.resolutions if i < a or i == 1 ])
             self.tiltres.update({l: res})
         return self.tiltres[l]
 
@@ -627,7 +628,7 @@ class GuiBase(ComplexImage):
         if objpath[0] not in self.images and len(objpath) == 1:
             return self.__getattribute__(objpath[0])(*args, **kwargs)
 
-        obj = self.getimage(self.images[obj], *objpath[1:])
+        obj = self.getimage(self.images[objpath[0]], *objpath[1:])
 
         if call:
             obj(*args, **kwargs)

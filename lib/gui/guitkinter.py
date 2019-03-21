@@ -20,7 +20,6 @@ except ImportError:
     from Tkinter import Canvas, Tk, PhotoImage
 
 from dat.reqImages import ReqImages #GET REQUIRED IMAGES
-from mixins.fileHandling import freader
 
 tk_border = 6    #Compensates for tkinters 6 pixel border
 base_size = [960, 640, 32]
@@ -59,7 +58,7 @@ class ImageName(object):
         self.shade = shade
         self.xsize = xsize
         self.ysize = ysize
-        self.rspin = sprites.rspinRes(name, xsize, ysize, rspin)
+        self.rspin = rspin
 
     def __hash__(self):
         return hash(str(self))
@@ -165,7 +164,7 @@ class SpriteEditor():
     def constDegree(degrees):
         while degrees < 0:
             degrees += 360
-        while degrees > 360
+        while degrees > 360:
             degrees -= 360
         return degrees
     
@@ -330,8 +329,8 @@ class SpriteLoader():
 class SpriteDict(SpriteLoader, object):
     """Image Dictionary"""
     def __contains__(self, x):
-        b = False
         x = str(x)
+        b = False
         b |= x in self.baseImages.keys()
         b |= x in self.editedImages.keys()
         return b
@@ -339,6 +338,7 @@ class SpriteDict(SpriteLoader, object):
     def __getitem__(self, image):
         assert isinstance(image, str) or isinstance(image, ImageName), 'incorrect type of arg image: should be type str or ImageName, is type {}'.format(type(image))
         img = ImageName(s=image)
+        img.res = self.rspinRes(img.name, img.xsize, img.ysize, img.rspin)
         if img in self:
             base = self.baseImages.get(str(image), None)
             edit = self.editedImages.get(str(image), None)

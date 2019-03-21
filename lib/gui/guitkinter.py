@@ -313,10 +313,10 @@ class SpriteLoader():
         sdata = rdata[2]
         width = sheet.width() / rdata[0]
         height = sheet.height()/ rdata[1]
-        for s in spriteinfo:
+        for s in sdata:
             try:
-                l = int(spdata[s][0] * width )
-                t = int(spdata[s][1] * height)
+                l = int(sdata[s][0] * width )
+                t = int(sdata[s][1] * height)
                 r = int(l + width )
                 b = int(t + height)
                 imges.update( { str(ImageName(s)): self.subimage(sheet, l, t, r, b) } )

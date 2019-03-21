@@ -143,7 +143,7 @@ class SpriteEditor():
     def rotateimg(image, degrees):
         degrees = SpriteEditor._posdegree(degrees)
         d = {
-            0: lamda x, d: x,
+            0: lambda x, d: x,
             90: SpriteEditor._turnImage,
             180: 'FUNCTION',
             270: SpriteEditor._turnImage
@@ -161,8 +161,8 @@ class SpriteEditor():
     def _flipImage(image, degrees, axis='y'):
         assert degrees == 180, 'degrees should be 180: is {}'.format(degrees)
         func = {
-            'x': lambda x, y: image.width() - x, y,
-            'y': lambda x, y: x, image.height() - y
+            'x': lambda x, y: (image.width() - x, y),
+            'y': lambda x, y: (x, image.height() - y)
         }
         func = func[axis]
         w = image.width()
@@ -180,8 +180,8 @@ class SpriteEditor():
         w = image.width()
         h = image.height()
         func = {
-            90: lambda x, y: h - y, x,
-            270: lambda x, y: y, w - x
+            90: lambda x, y: (h - y, x),
+            270: lambda x, y: (y, w - x)
         }
         func = func[degrees]
         newimage = PhotoImage(width=h, height=w)
@@ -409,12 +409,11 @@ class SpriteDict(SpriteLoader, object):
         l = max([w, h])
         
         if l not in self.tiltres:
-            a = math.atan(float(pixel) / l
+            a = math.atan(float(pixel) / l)
             a = math.degrees(a)
             res = max([ i for i in SpriteEditor.resolutions if i < deg or i == 1 ])
             self.tiltres.update({l: res})
         return self.tiltres[l]
-                         
 
     
 class _ImageDictionary():

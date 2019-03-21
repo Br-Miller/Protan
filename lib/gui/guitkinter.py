@@ -136,7 +136,8 @@ class SpriteEditor():
             for y in range(h):
                 dx, dy = func(x, y)
                 rgb = SpriteEditor.getpixel(image, x, y)
-                SpriteEditor.setpixel(newimage, dx, dy, *rgb)
+                if rgb != (0, 0, 0):
+                    SpriteEditor.setpixel(newimage, dx, dy, *rgb)
         
     @staticmethod
     def _rotateImage(image, degrees, crop=True):
@@ -167,7 +168,8 @@ class SpriteEditor():
             for y in range(h):
                 dx, dy = func(x, y)
                 rgb = SpriteEditor.getpixel(image, x, y)
-                SpriteEditor.setpixel(newimage, dx, dy, *rgb)
+                if rbg != (0, 0, 0):
+                    SpriteEditor.setpixel(newimage, dx, dy, *rgb)
         return newimage
     
     @staticmethod

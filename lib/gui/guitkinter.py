@@ -118,7 +118,7 @@ class SpriteEditor():
     @staticmethod
     def cropimage(image, l, t, r, b):
         img = PhotoImage()
-        img.tk.call(img, 'copy', spritesheet, '-from', l, t, r, b, '-to', 0, 0)
+        img.tk.call(img, 'copy', image, '-from', l, t, r, b, '-to', 0, 0)
         return img
     
     @staticmethod

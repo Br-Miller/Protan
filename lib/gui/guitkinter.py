@@ -8,6 +8,7 @@ import re
 import sys
 import math
 import time
+import string
 import warnings
 
 
@@ -607,9 +608,9 @@ class Keyboard(object):
         return time.clock() - self.cache[key][1] - self.target
            
     @staticmethod
-    def updateKey(key):
+    def updateKey(key, tipe):
         for i in Keyboard.instances:
-            i._updateKey(*key)
+            i._updateKey(key, tipe)
     
     def ispressed(self, key):
         return self.state(key) == 'pressed'
@@ -628,19 +629,27 @@ class Keyboard(object):
         c = self.delta(key) > self.target
         return Keyboard.states[s][c]
     
-    
 class UserInput(object):
     def __init__(self):
         self.keyboard = Keyboard()
+        self.mousepos = (0, 0)
+        self.mouseclicks = []
     
     def handleKeyPress(self, event):
-        pass
+        self.keyboard.updateKey(event.keysym, 'pressed')
         
     def handleKeyRelease(self, event):
-        pass
+        self.keyboard.updateKey(event.keysym, 'released')
+    
+    def handleMousePress(self, event):
+        self.mouseclicks.append(((event.x, event.y), 'pressed'))
         
+    def handleMouseRelease(self, event):
+        self.mouseclicks.append(((event.x, event.y), 'released'))
+    
+    def handleMouseMove(self, event):
+        self.mousepos = (event.x, event.y)
         
-            
 class GuiBase(ComplexImage):
     """tkinter base gui module"""
     def __call__(self, objpath, call, *args, **kwargs):
@@ -672,6 +681,7 @@ class GuiBase(ComplexImage):
         tk = Tk()
         self.canvas = Canvas(tk, width=base_size[0]+tk_border, height=base_size[1]+tk_border, takefocus=True)
         self.canvas.pack()
+        self.userinput = UserInput()
         _canvas = self.canvas
         sprites = SpriteDict()
         imageDict = _ImageDictionary()

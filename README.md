@@ -1,13 +1,6 @@
 # Protan
 A simple game made from Python
 
-## Usage
-Run it by executing*
-
-    $ ENTER TEXT HERE
- 
-**Not completed*
-
 ## Contributing
 
 1. Fork it

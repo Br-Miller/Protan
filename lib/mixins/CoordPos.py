@@ -244,7 +244,7 @@ class Direction(object):
         self._dx = None
         self._dy = None
         if isinstance(direction, str):
-            direction = Direction.strtoint[direction] 
+            direction = Direction.strToInt(direction) 
         elif isinstance(direction, Direction):
             direction = direction.direction
         self.direction = direction
@@ -269,13 +269,18 @@ class Direction(object):
     def linear(n):
         return n in [0, 2, 4, 6] or n in ['n', 's', 'e', 'w']
 
-
+    @staticmethod
+    def strToInt(s):
+        for k, v in Direction.directions.items():
+            if v == s:
+                return k
+    
     @staticmethod
     def isDir(n):
         """Returns whether int n or str n is considered a direction. Directions include numbers 0 to 8"""
         assert isinstance(n, int) or isinstance(n, str) or isinstance(n, Direction), 'incorrect type of arg n: should be type int, str or Direction, is type {}'.format(type(n))
-        dd = n in Direction.directions
-        ds = n in Direction.strtoint
+        dd = n in Direction.directions.keys()
+        ds = n in Direction.directions.values()
         return dd or ds or isinstance(n, Direction)
 
     @property
@@ -296,56 +301,6 @@ class Direction(object):
     def dy(self):
         return Direction.displacement[self.direction][1]
     
-
-class CoordList(list):
-    """A custom list for containing Coordinate Class instances
-    This class contains coordinates relative to a base coordinate
-    Inherits list
-    """
-    def __init__(self, basecoord, *args):
-        args = self.formatInput(args)
-        self.basecoord = Coordinate(*basecoord)
-        super(CoordList, self).__init__(*args)
-
-    def __getitem__(self, n):
-        coord = super(CoordList, self).__getitem__(n)
-        coord = coord.shift(self.basecoord)
-        return coord
-
-    def __iter__(self):
-        l = [ coord.shift(self.basecoord) for coord in super(CoordList, self).__iter__() ]
-        return iter(l)
-
-    def __add__(self, cl):
-        x, y = CoordIt.formatCoord(self.basecoord, to=tuple)
-        l = [ (c.x - x, c.y - y) for c in cl.exact() ]
-        
-    def exact(self):
-        return [ c for c in self ]
-
-    def flip(self, axis='x'):
-        l = map(lambda x: x.flip(axis=axis), self)
-        return CoordList(self.basecoord, l)
-
-    def shift(self, x, y=None):
-        x1, y1 = self.basecoord
-        x2, y2 = CoordIt.formatCoord(self.basecoord, to=tuple)
-        self.basecoord = (x2 - x1, y2 - y1)
-
-    @staticmethod
-    def formatInput(l):
-        return [ CoordIt.formatCoord(c, to='coord') for c in l ]
-
-    @property
-    def basecoord(self):
-        return self._basecoord
-
-    @basecoord.setter
-    def basecoord(self, x, y=None):
-        coord = self.formatCoord(x, y=y, to='coord')
-        self._basecoord = coord
-
-
 class Coordinate(object):
     """Coordinate class to allow for easy access to coordinate functions
     There are three sizes. Tile > Pixel > Subpixel

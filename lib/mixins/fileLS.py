@@ -102,7 +102,7 @@ class FileLS():
         FRead._write(path, data)
 
     @staticmethod
-    def readFile(path, s=None, d=None, w=None):
+    def read(path, s=None, d=None, w=None):
         """Reads a file and deserialises the result
         Deserialises file contents or rewrites them on error
 

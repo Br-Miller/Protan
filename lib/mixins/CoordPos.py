@@ -22,9 +22,7 @@ class AxisDistance(object):
             px: Pixel
             sx: Subpixel
         """
-        assert isinstance(t, int), 'incorrect type of arg t: should be type int, is type {}'.format(type(t))
-        assert isinstance(px, int), 'incorrect type of arg px: should be type int, is type {}'.format(type(px))
-        assert isinstance(sx, int), 'incorrect type of arg sx: should be type int, is type {}'.format(type(sx))
+        t, px, sx = self.convertArgs(t, px, sx)
         self.tile = t
         self.pixel = px
         self.subpixel = sx
@@ -42,13 +40,6 @@ class AxisDistance(object):
     def __repr__(self):
         """x.__repr__() <=> repr(x)"""
         return '{}t{}px{}sx'.format(self.tile, self.pixel, self.subpixel)
-
-    @classmethod
-    def fromStr(cls, s):
-        """Generates an AxisDistance instance from a string"""
-        assert isinstance(s, str), 'incorrect type of arg s: should be type str, is type {}'.format(type(s))
-        s = [ int(n) for n in s.split('.') ]
-        return cls(*s)
 
     def __add__(self, x):
         """x.__add__(y) <=> x + y"""
@@ -134,9 +125,17 @@ class AxisDistance(object):
         if self.tile < 0:
             return -AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
         return AxisDistance(t=self.tile, px=self.pixel, sx=self.subpixel)
+    
+    @classmethod
+    def fromStr(cls, s):
+        """Generates an AxisDistance instance from a string"""
+        assert isinstance(s, str), 'incorrect type of arg s: should be type str, is type {}'.format(type(s))
+        s = [ int(n) for n in s.split('.') ]
+        return cls(*s)
 
     def shift(self, t=0, px=0, sx=0):
         """Shifts this instance by the set amount"""
+        t, px, sx = self.convertArgs(t, px, sx)
         self.tile += t  
         self.pixel += px  
         self.subpixel += sx  
@@ -161,10 +160,10 @@ class AxisDistance(object):
 
         return lowUnit, highUnit
     
-    def rounded(self, lvl='p'):
+    def rounded(self, lvl='px'):
         """Rounds down to the nearest pixel or tile"""
         d = {
-            'p': {'t': self.tile, 'px': self.pixel},
+            'px': {'t': self.tile, 'px': self.pixel},
             't': {'t': self.tile},
         }
         return AxisDistance(**d[lvl])
@@ -179,6 +178,21 @@ class AxisDistance(object):
         else:
             return self
 
+    def convertArgs(self, t=0, px=0, sx=0):
+        if isinstance(t, tuple) or isinstance(t, list) or isinstance(t, AxisDistance):
+            return tuple(t)
+            
+        elif isinstance(t, dict):
+            return (t.get("t", 0), t.get("px", 0), t.get("sx", 0))
+        
+        elif isinstance(t, str):
+            return tuple([ int(i) for i in t.split(".") ])
+            
+        elif isinstance(t, int):
+            return (t, px, sx)
+        
+        raise Exception("Unknown argument type")
+        
     def toTiles(self):
         return self.tile
 

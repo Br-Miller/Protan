@@ -643,21 +643,21 @@ class UserInput(object):
         for _ in range(dif):
             dif.pop()
     
-    def KeyPress(self, event):
+    def keyPress(self, event):
         self.keyboard.updateKey(event.keysym, 'pressed')
         
-    def KeyRelease(self, event):
+    def keyRelease(self, event):
         self.keyboard.updateKey(event.keysym, 'released')
     
-    def MousePress(self, event):
+    def mousePress(self, event):
         self.mouseclicks.append(((event.x, event.y), 'pressed'))
         self.cleanup()
         
-    def MouseRelease(self, event):
+    def mouseRelease(self, event):
         self.mouseclicks.append(((event.x, event.y), 'released'))
         self.cleanup()
     
-    def MouseMove(self, event):
+    def mouseMove(self, event):
         self.mousepos = (event.x, event.y)
         
 class GuiBase(ComplexImage):

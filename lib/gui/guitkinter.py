@@ -21,13 +21,15 @@ try:
 except ImportError:
     from Tkinter import Canvas, Tk, PhotoImage
 
-from dat.reqImages import ReqImages #GET REQUIRED IMAGES
+from mixins.fileLS import FileLS
+from dat.reqImages import ReqImages #Replace
 
 tk_border = 6    #Compensates for tkinters 6 pixel border
 base_size = [960, 640, 32]
 maxSprites = 3000
 BoardWidth = 30
 BoardHeight = 20
+keybindFile = '../dat/tkeybinds.json'
 
 
 class GuiError(Exception):
@@ -574,7 +576,7 @@ class ComplexImage(object):
 
 class Keyboard(object):
     instances = []
-    keys = 'a'
+    keylist = FileLS.read(keybindFile, s='j')
     states = {
         'pressed': {
             True: 'held',
@@ -591,16 +593,15 @@ class Keyboard(object):
         
     def __init__(self, fhz=60):
         self.target = 1 // 60
-        self.cache = { c: ['letgo', time.clock() + self.target] for c in keys } #FOR EACH KEY CREATE TIMER
+        self.cache = { c: ['letgo', time.clock() + self.target] for c in list(keylist.values()) } #FOR EACH KEY CREATE TIMER
         Keyboard.instances.update(self)
 
-    def _updateKey(self, key, tipe):
-        key, tipe = key
-        if not(self.ispressed(key) or self.held(key)) and tipe == 'pressed':
+    def _updateKey(self, key, tpe):
+        if not(self.ispressed(key) or self.held(key)) and tpe == 'pressed':
             self.cache[key][0] = 'pressed'
             self.cache[key][1] = time.clock()
 
-        elif not(self.isletgo(key) or self.isoff(key)) and tipe == 'released':
+        elif not(self.isletgo(key) or self.isoff(key)) and tpe == 'released':
             self.cache[key][0] = 'letgo'
             self.cache[key][1] = time.clock()
             
@@ -608,9 +609,9 @@ class Keyboard(object):
         return time.clock() - self.cache[key][1] - self.target
            
     @staticmethod
-    def updateKey(key, tipe):
+    def updateKey(key, tpe):
         for i in Keyboard.instances:
-            i._updateKey(key, tipe)
+            i._updateKey(key, tpe)
     
     def ispressed(self, key):
         return self.state(key) == 'pressed'
@@ -634,20 +635,29 @@ class UserInput(object):
         self.keyboard = Keyboard()
         self.mousepos = (0, 0)
         self.mouseclicks = []
+        #mousewheel accel
     
-    def handleKeyPress(self, event):
+    def cleanup(self):
+        dif = len(self.mouseclick) - 5
+        if dif > 0
+        for _ in range(dif):
+            dif.pop()
+    
+    def KeyPress(self, event):
         self.keyboard.updateKey(event.keysym, 'pressed')
         
-    def handleKeyRelease(self, event):
+    def KeyRelease(self, event):
         self.keyboard.updateKey(event.keysym, 'released')
     
-    def handleMousePress(self, event):
+    def MousePress(self, event):
         self.mouseclicks.append(((event.x, event.y), 'pressed'))
+        self.cleanup()
         
-    def handleMouseRelease(self, event):
+    def MouseRelease(self, event):
         self.mouseclicks.append(((event.x, event.y), 'released'))
+        self.cleanup()
     
-    def handleMouseMove(self, event):
+    def MouseMove(self, event):
         self.mousepos = (event.x, event.y)
         
 class GuiBase(ComplexImage):

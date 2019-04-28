@@ -17,6 +17,7 @@ except ImportError:
     import gui.guitkinter as GuiModule        
 
 
+UserInput = GuiModule.UserInput
 ImageName = GuiModule.ImageName
 DormantImage = GuiModule.DormantImage
 ComplexImage = GuiModule.ComplexImage

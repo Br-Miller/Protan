@@ -38,19 +38,25 @@ class FStr():
         s = s.split('.')[0]
         return s
 
-class FRead(): #RECREATE
-    """File reading and handling class"""
+class FileLS():
+    """File loading and deserialising class"""
     serialiseDict = {
         None: lambda s: s,
         'json': json.dumps,
         'pickle': pickle.dumps,
-        'marshal': marshal.dumps
+        'marshal': marshal.dumps,
+        'j': json.dumps,
+        'p': pickle.dumps,
+        'm': marshal.dumps
     }
     deserialiseDict = {
         None: lambda s: s,
         'json': json.loads,
         'pickle': pickle.loads,
-        'marshal': marshal.loads
+        'marshal': marshal.loads,
+        'j': json.dumps,
+        'p': pickle.dumps,
+        'm': marshal.dumps
     }
     @staticmethod
     def serialise(s, tpe=None):
@@ -59,9 +65,9 @@ class FRead(): #RECREATE
 
     @staticmethod
     def deserialise(s, tpe=None):
-        if isinstance(s, str):
-            func = FRead.deserialiseDict[tpe]
-            return func(s)
+        assert isinstance(s, str), 'incorrect type of arg s: should be type str, is type {}'.format(type(s))
+        func = FRead.deserialiseDict[tpe]
+        return func(s)
         return s
 
     @staticmethod
@@ -85,19 +91,19 @@ class FRead(): #RECREATE
 
     @staticmethod
     def write(path, data, s=None):
-        """Operates on data and writes the result in a file
+        """Serialises data then writes it to a file
         Serialises file contents
 
         Args:
-            s: Serialisation type type
-            path: The path of the file to be read
+            s: Serialisation type
+            path: The path of the file to be written to
         """
         data = FRead.serialise(data, tpe=s)
         FRead._write(path, data)
 
     @staticmethod
     def readFile(path, s=None, d=None, w=None):
-        """Reads a file and operates on the result
+        """Reads a file and deserialises the result
         Deserialises file contents or rewrites them on error
 
         Args:
@@ -112,14 +118,14 @@ class FRead(): #RECREATE
         return f
 
     @staticmethod
-    def readE(path, f, s=None, d=None, w=None):
-        """docstring for readError"""
+    def readE(path, contents, ser=None, default=None, write=None):
+        """Ensures that there isn't a error."""
         if isinstance(f, IOError):
-            f = d or f
+            contents = default or contents
 
-            if w and d:
-                FRead.write(path, d, s=s)
-        return f
+            if write and d:
+                FRead.write(path, default, ser=ser)
+        return contents
 
 
 class FGlob():
@@ -135,9 +141,4 @@ class FGlob():
             files = [ filestr(i).pathend(extension=exten) for i in files ]
             
         return files
-
-    @staticmethod
-    def name(arg):
-        """docstring for name"""
-        pass
         

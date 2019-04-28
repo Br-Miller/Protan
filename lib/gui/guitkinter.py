@@ -591,9 +591,9 @@ class Keyboard(object):
         Keyboard.instances.remove(self)
         super(Keyboard, self).__del__()
         
-    def __init__(self, fhz=60):
+    def __init__(self, keys, fhz=60):
         self.target = 1 // 60
-        self.cache = { c: ['letgo', time.clock() + self.target] for c in list(keylist.values()) } #FOR EACH KEY CREATE TIMER
+        self.cache = { i: ['letgo', time.clock() + self.target] for i in keys } #FOR EACH KEY CREATE TIMER
         Keyboard.instances.update(self)
 
     def _updateKey(self, key, tpe):
@@ -631,8 +631,8 @@ class Keyboard(object):
         return Keyboard.states[s][c]
     
 class UserInput(object):
-    def __init__(self):
-        self.keyboard = Keyboard()
+    def __init__(self, keys):
+        self.keyboard = Keyboard(keys)
         self.mousepos = (0, 0)
         self.mouseclicks = []
         #mousewheel accel
